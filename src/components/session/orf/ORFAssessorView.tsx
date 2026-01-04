@@ -1,6 +1,6 @@
-import { useState, useCallback, useMemo, useEffect } from 'react';
+import { useState, useCallback, useMemo, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Monitor, Users, LogOut, BookOpen, CheckCircle, AlertTriangle, XCircle } from 'lucide-react';
+import { Users, LogOut, BookOpen, CheckCircle, AlertTriangle, XCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
@@ -26,7 +26,10 @@ import {
   type WordStatus,
   type FluencyScores,
 } from './index';
+import { AudioRecordingControls } from './AudioRecordingControls';
 import { useSessionRealtime } from '@/hooks/useSessionRealtime';
+import { useAudioRecorder } from '@/hooks/useAudioRecorder';
+import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import type { Database } from '@/integrations/supabase/types';
 
@@ -64,6 +67,22 @@ export function ORFAssessorView({ sessionId }: ORFAssessorViewProps) {
   const [observations, setObservations] = useState<Record<string, number | string>>({});
   const [activeTab, setActiveTab] = useState<'scoring' | 'results'>('scoring');
   const [isTimerComplete, setIsTimerComplete] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  
+  // Audio recording
+  const {
+    isRecording,
+    isPaused,
+    error: recordingError,
+    startRecording,
+    pauseRecording,
+    resumeRecording,
+    stopRecording,
+    uploadRecording,
+    cancelRecording,
+  } = useAudioRecorder();
+  
+  const recordingBlobRef = useRef<Blob | null>(null);
 
   // Extract passage from stimulus data
   const passage = useMemo(() => {
@@ -111,12 +130,22 @@ export function ORFAssessorView({ sessionId }: ORFAssessorViewProps) {
     setFluencyScores(prev => ({ ...prev, [dimension]: value }));
   }, []);
 
-  const handleTimerComplete = useCallback(() => {
+  const handleTimerComplete = useCallback(async () => {
     setIsTimerComplete(true);
     updateSessionState({ isTimerRunning: false });
+    
+    // Stop recording when timer completes
+    if (isRecording) {
+      const blob = await stopRecording();
+      if (blob) {
+        recordingBlobRef.current = blob;
+        toast.success('Recording captured');
+      }
+    }
+    
     toast.success('Timer complete! Mark stopping point and review scores.');
     setActiveTab('results');
-  }, [updateSessionState]);
+  }, [updateSessionState, isRecording, stopRecording]);
 
   const handleObservationsUpdate = useCallback((obs: Record<string, number | string>) => {
     setObservations(obs);
@@ -125,9 +154,10 @@ export function ORFAssessorView({ sessionId }: ORFAssessorViewProps) {
   const handleSaveResults = useCallback(async () => {
     if (!currentSubtest) return;
 
+    setIsSaving(true);
     try {
       // Save the ORF response with all scoring data
-      await recordResponse({
+      const { data: responseData } = await recordResponse({
         subtest_id: currentSubtest.id,
         item_index: sessionState.currentItemIndex,
         score_code: 'correct', // ORF uses aggregate scoring
@@ -144,6 +174,41 @@ export function ORFAssessorView({ sessionId }: ORFAssessorViewProps) {
         }),
       });
 
+      // Upload audio recording if available
+      if (recordingBlobRef.current) {
+        try {
+          const uploadResult = await uploadRecording(
+            recordingBlobRef.current,
+            sessionId,
+            currentSubtest.id
+          );
+          
+          // Save recording metadata to database
+          const accuracy = wordsAttempted > 0 
+            ? Math.round((wordsCorrect / wordsAttempted) * 10000) / 100 
+            : 0;
+            
+          await supabase.from('orf_audio_recordings').insert([{
+            session_id: sessionId,
+            subtest_id: currentSubtest.id,
+            response_id: responseData?.id || null,
+            storage_path: uploadResult.storagePath,
+            duration_seconds: uploadResult.durationSeconds,
+            file_size_bytes: uploadResult.fileSizeBytes,
+            wcpm,
+            accuracy_percent: accuracy,
+            word_marks: wordMarks as unknown as Database['public']['Tables']['orf_audio_recordings']['Insert']['word_marks'],
+            fluency_scores: fluencyScores as unknown as Database['public']['Tables']['orf_audio_recordings']['Insert']['fluency_scores'],
+          }]);
+          
+          toast.success('Recording saved for AI training');
+        } catch (uploadErr) {
+          console.error('Failed to upload recording:', uploadErr);
+          toast.error('Recording upload failed, but scores saved');
+        }
+        recordingBlobRef.current = null;
+      }
+
       toast.success('ORF results saved');
 
       // Move to next subtest if available
@@ -159,15 +224,20 @@ export function ORFAssessorView({ sessionId }: ORFAssessorViewProps) {
         updateSessionState({ timerSeconds: 0, isTimerRunning: false });
       }
     } catch (err) {
+      console.error('Save error:', err);
       toast.error('Failed to save results');
+    } finally {
+      setIsSaving(false);
     }
   }, [
     currentSubtest, 
+    sessionId,
     sessionState, 
     recordResponse, 
     subtests, 
     navigateToSubtest, 
     updateSessionState,
+    uploadRecording,
     wcpm, 
     wordsAttempted, 
     wordsCorrect, 
@@ -312,6 +382,24 @@ export function ORFAssessorView({ sessionId }: ORFAssessorViewProps) {
                 onComplete={handleTimerComplete}
               />
 
+              {/* Audio Recording Controls */}
+              <AudioRecordingControls
+                isRecording={isRecording}
+                isPaused={isPaused}
+                isTimerRunning={sessionState.isTimerRunning}
+                error={recordingError}
+                onStart={startRecording}
+                onPause={pauseRecording}
+                onResume={resumeRecording}
+                onStop={async () => {
+                  const blob = await stopRecording();
+                  if (blob) {
+                    recordingBlobRef.current = blob;
+                    toast.info('Recording stopped - will be saved with results');
+                  }
+                }}
+              />
+
               {/* Tabs for Scoring vs Results */}
               <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as 'scoring' | 'results')}>
                 <TabsList className="grid w-full grid-cols-2">
@@ -342,8 +430,9 @@ export function ORFAssessorView({ sessionId }: ORFAssessorViewProps) {
                       onClick={handleSaveResults} 
                       className="w-full mt-4"
                       size="lg"
+                      disabled={isSaving}
                     >
-                      Save & Continue
+                      {isSaving ? 'Saving...' : (recordingBlobRef.current ? 'Save with Recording' : 'Save & Continue')}
                     </Button>
                   )}
                 </TabsContent>

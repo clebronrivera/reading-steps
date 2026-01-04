@@ -205,6 +205,76 @@ export type Database = {
           },
         ]
       }
+      orf_audio_recordings: {
+        Row: {
+          accuracy_percent: number | null
+          created_at: string
+          created_by: string | null
+          duration_seconds: number | null
+          file_size_bytes: number | null
+          fluency_scores: Json | null
+          id: string
+          response_id: string | null
+          session_id: string
+          storage_path: string
+          subtest_id: string
+          wcpm: number | null
+          word_marks: Json | null
+        }
+        Insert: {
+          accuracy_percent?: number | null
+          created_at?: string
+          created_by?: string | null
+          duration_seconds?: number | null
+          file_size_bytes?: number | null
+          fluency_scores?: Json | null
+          id?: string
+          response_id?: string | null
+          session_id: string
+          storage_path: string
+          subtest_id: string
+          wcpm?: number | null
+          word_marks?: Json | null
+        }
+        Update: {
+          accuracy_percent?: number | null
+          created_at?: string
+          created_by?: string | null
+          duration_seconds?: number | null
+          file_size_bytes?: number | null
+          fluency_scores?: Json | null
+          id?: string
+          response_id?: string | null
+          session_id?: string
+          storage_path?: string
+          subtest_id?: string
+          wcpm?: number | null
+          word_marks?: Json | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "orf_audio_recordings_response_id_fkey"
+            columns: ["response_id"]
+            isOneToOne: false
+            referencedRelation: "responses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "orf_audio_recordings_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "sessions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "orf_audio_recordings_subtest_id_fkey"
+            columns: ["subtest_id"]
+            isOneToOne: false
+            referencedRelation: "subtests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       parent_checklist_items: {
         Row: {
           category: string
