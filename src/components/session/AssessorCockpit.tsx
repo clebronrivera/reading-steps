@@ -13,7 +13,6 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
 import {
   AlertDialog,
-  AlertDialogAction,
   AlertDialogCancel,
   AlertDialogContent,
   AlertDialogDescription,
@@ -28,6 +27,7 @@ import { ScoringButtons } from './ScoringButtons';
 import { ObservationPanel } from './ObservationPanel';
 import { SubtestNavigation } from './SubtestNavigation';
 import { ScriptPrompt } from './ScriptPrompt';
+import { ORFAssessorView } from './orf';
 import { useSessionRealtime } from '@/hooks/useSessionRealtime';
 import { toast } from 'sonner';
 import type { Database } from '@/integrations/supabase/types';
@@ -164,6 +164,11 @@ export function AssessorCockpit({ sessionId }: AssessorCockpitProps) {
         </div>
       </div>
     );
+  }
+
+  // Use specialized ORF view for oral reading fluency modules
+  if (currentSubtest?.module_type === 'orf') {
+    return <ORFAssessorView sessionId={sessionId} />;
   }
 
   // Count responses for current subtest
