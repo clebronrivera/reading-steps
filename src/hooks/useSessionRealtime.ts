@@ -23,7 +23,7 @@ export interface UseSessionRealtimeReturn {
   error: string | null;
   updateSessionState: (updates: Partial<SessionState>) => void;
   navigateToSubtest: (subtestId: string) => Promise<void>;
-  recordResponse: (response: Omit<Database['public']['Tables']['responses']['Insert'], 'session_id'>) => Promise<void>;
+  recordResponse: (response: Omit<Database['public']['Tables']['responses']['Insert'], 'session_id'>) => Promise<{ data: Response | null }>;
   updateSession: (updates: Partial<Database['public']['Tables']['sessions']['Update']>) => Promise<void>;
 }
 
@@ -168,15 +168,18 @@ export function useSessionRealtime(sessionId: string): UseSessionRealtimeReturn 
   // Record a response
   const recordResponse = useCallback(async (
     response: Omit<Database['public']['Tables']['responses']['Insert'], 'session_id'>
-  ) => {
-    const { error } = await supabase
+  ): Promise<{ data: Database['public']['Tables']['responses']['Row'] | null }> => {
+    const { data, error } = await supabase
       .from('responses')
       .insert({
         ...response,
         session_id: sessionId,
-      });
+      })
+      .select()
+      .single();
     
     if (error) throw error;
+    return { data };
   }, [sessionId]);
 
   // Update session
