@@ -88,6 +88,44 @@ export type Database = {
         }
         Relationships: []
       }
+      assessor_session_tokens: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          expires_at: string
+          id: string
+          session_id: string
+          token_hash: string
+          used_at: string | null
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          expires_at?: string
+          id?: string
+          session_id: string
+          token_hash: string
+          used_at?: string | null
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          expires_at?: string
+          id?: string
+          session_id?: string
+          token_hash?: string
+          used_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "assessor_session_tokens_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       domain_scores: {
         Row: {
           created_at: string
@@ -768,6 +806,10 @@ export type Database = {
           _user_id: string
         }
         Returns: boolean
+      }
+      validate_assessor_token: {
+        Args: { token_value: string }
+        Returns: string
       }
       validate_portal_token: { Args: { token_value: string }; Returns: string }
     }
