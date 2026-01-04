@@ -17,6 +17,7 @@ import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
 import SessionAssessor from "./pages/SessionAssessor";
 import SessionStudent from "./pages/SessionStudent";
+import SessionCover from "./pages/SessionCover";
 import ParentPortal from "./pages/ParentPortal";
 import SessionReport from "./pages/SessionReport";
 import NotFound from "./pages/NotFound";
@@ -43,7 +44,7 @@ const App = () => (
           <Route path="/login" element={<Login />} />
           <Route path="/portal" element={<ParentPortal />} />
           
-{/* Dashboard Routes */}
+          {/* Dashboard Routes */}
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/dashboard/session" element={<SessionLaunch />} />
           
@@ -51,6 +52,7 @@ const App = () => (
           <Route path="/session/:id/assessor" element={<SessionAssessor />} />
           <Route path="/session/:id/student" element={<SessionStudent />} />
           <Route path="/session/:id/report" element={<SessionReport />} />
+          <Route path="/session/cover" element={<SessionCover />} />
           
           {/* Catch-all */}
           <Route path="*" element={<NotFound />} />
