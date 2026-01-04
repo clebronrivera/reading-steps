@@ -24,6 +24,7 @@ const navItems = [
   { href: "/dashboard", icon: Users, label: "Students" },
   { href: "/dashboard/appointments", icon: Calendar, label: "Appointments" },
   { href: "/dashboard/assessments", icon: Library, label: "Assessments" },
+  { href: "/dashboard/passages", icon: BookOpen, label: "Passages" },
   { href: "/dashboard/session", icon: PlayCircle, label: "Session Runner" },
   { href: "/dashboard/reports", icon: FileText, label: "Reports" },
 ];
