@@ -20,6 +20,7 @@ import SessionStudent from "./pages/SessionStudent";
 import SessionCover from "./pages/SessionCover";
 import ParentPortal from "./pages/ParentPortal";
 import SessionReport from "./pages/SessionReport";
+import PassageManager from "./pages/PassageManager";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -47,6 +48,7 @@ const App = () => (
           {/* Dashboard Routes */}
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/dashboard/session" element={<SessionLaunch />} />
+          <Route path="/dashboard/passages" element={<PassageManager />} />
           
           {/* Session Routes - Split Screen System */}
           <Route path="/session/:id/assessor" element={<SessionAssessor />} />
