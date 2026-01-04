@@ -1,0 +1,167 @@
+{
+  "intake": {
+    "title": "Intake Form",
+    "subtitle": "Complete this form to book your free reading screening session.",
+    "steps": {
+      "parentInfo": "Parent/Guardian Information",
+      "studentInfo": "Student Information",
+      "concerns": "Reading Concerns & Goals",
+      "consent": "Consent & Submit"
+    },
+    "parent": {
+      "fullName": "Full Name",
+      "fullNamePlaceholder": "Your full name",
+      "email": "Email Address",
+      "emailPlaceholder": "your@email.com",
+      "phone": "Phone Number",
+      "phonePlaceholder": "(555) 123-4567",
+      "relationship": "Relationship to Student",
+      "relationships": {
+        "mother": "Mother",
+        "father": "Father",
+        "grandparent": "Grandparent",
+        "guardian": "Legal Guardian",
+        "sibling": "Sibling",
+        "other": "Other"
+      }
+    },
+    "student": {
+      "fullName": "Student's Full Name",
+      "fullNamePlaceholder": "Child's full name",
+      "dob": "Date of Birth",
+      "grade": "Current Grade",
+      "gradePlaceholder": "Select grade",
+      "school": "School Name (optional)",
+      "schoolPlaceholder": "Current school",
+      "languages": "Languages Spoken at Home",
+      "languagesPlaceholder": "e.g., English, Spanish",
+      "languagesDescription": "Separate multiple languages with commas"
+    },
+    "grades": {
+      "kindergarten": "Kindergarten",
+      "1st": "1st Grade",
+      "2nd": "2nd Grade",
+      "3rd": "3rd Grade",
+      "4th": "4th Grade",
+      "5th": "5th Grade",
+      "6th": "6th Grade",
+      "7th": "7th Grade",
+      "8th": "8th Grade",
+      "9th": "9th Grade",
+      "10th": "10th Grade",
+      "11th": "11th Grade",
+      "12th": "12th Grade"
+    },
+    "learningContext": {
+      "title": "Language & Learning Context",
+      "elStatus": "Currently or previously classified as English Learner (EL/ELL)",
+      "speechHistory": "Speech/Language History",
+      "speechHistoryPlaceholder": "Any speech therapy, language delays, etc.",
+      "speechHistoryDescription": "Note any speech therapy, language delays, or communication concerns",
+      "visionHearing": "Vision & Hearing Status",
+      "visionHearingPlaceholder": "e.g., Passed school screening, wears glasses",
+      "visionHearingDescription": "When were they last checked? Any concerns?",
+      "attendance": "Frequent absences or school changes that may have impacted learning"
+    },
+    "concerns": {
+      "title": "Primary Reading Concerns",
+      "description": "Select all that apply",
+      "letterNames": "Letter Names (difficulty identifying letters)",
+      "letterSounds": "Letter Sounds (difficulty connecting letters to sounds)",
+      "phonological": "Phonological Awareness (rhyming, syllables, sounds in words)",
+      "decoding": "Decoding (sounding out words)",
+      "fluency": "Fluency (slow, choppy, or inaccurate reading)",
+      "comprehension": "Comprehension (understanding what is read)",
+      "spelling": "Spelling difficulties",
+      "other": "Other concerns"
+    },
+    "supports": {
+      "title": "Current School Supports",
+      "description": "What supports is the student currently receiving?",
+      "none": "None / Not currently receiving supports",
+      "mtss": "MTSS/RTI (tiered intervention)",
+      "504": "504 Plan",
+      "iep": "IEP (Individualized Education Program)",
+      "pastEval": "Past evaluation (school or private)",
+      "tutoring": "Private tutoring"
+    },
+    "observations": {
+      "interventions": "Previous Interventions Tried",
+      "interventionsPlaceholder": "Describe any reading programs, tutoring, or interventions that have been tried...",
+      "interventionsDescription": "What has been tried at home or school?",
+      "parentObs": "What are you noticing?",
+      "parentObsPlaceholder": "Describe specific reading behaviors you've observed...",
+      "parentObsDescription": "Share specific examples of reading challenges you've observed"
+    },
+    "goal": {
+      "title": "What is your primary goal for this screening?",
+      "schoolSupport": "I want help getting support from the school",
+      "tutoringPlan": "I want a tutoring/intervention plan",
+      "evalGuidance": "I want guidance on whether to request a formal evaluation",
+      "fullReport": "I want a comprehensive report I can share"
+    },
+    "otherConcerns": {
+      "title": "Please check any other specific areas of concern",
+      "description": "Select all that apply",
+      "math": "Difficulty with Math (Counting, calculations, word problems)",
+      "social": "Social Skills (Difficulty making friends, understanding social cues)",
+      "speech": "Speech & Language (Articulation, stuttering, limited vocabulary)",
+      "anxiety": "Anxiety (Excessive worry about school or performance)",
+      "avoidance": "Avoidance (Refuses to go to school or engage in learning tasks)",
+      "sensory": "Sensory Issues (Sensitive to loud noises, textures, or lights)"
+    },
+    "additionalInfo": "Is there anything else we should know?",
+    "additionalInfoPlaceholder": "Any additional information that might be helpful...",
+    "consent": {
+      "screeningTitle": "Consent to Screening",
+      "screeningText": "I understand this is an educational screening, not a clinical diagnosis. I consent to my child participating in this virtual reading screening session.",
+      "dataTitle": "Consent to Data Storage",
+      "dataText": "I consent to having screening results and session data stored securely for the purpose of generating reports and recommendations.",
+      "recordTitle": "Optional: Consent to Session Recording",
+      "recordText": "I consent to having the Zoom session recorded for quality assurance and training purposes. Recordings are stored securely and deleted after 30 days."
+    },
+    "session": {
+      "formatTitle": "Preferred Session Format",
+      "online": "Online / Remote",
+      "inPerson": "In-Person",
+      "inPersonNote": "Note: In-person testing will occur in a designated library space to ensure a quiet, neutral environment."
+    },
+    "availability": {
+      "title": "Availability",
+      "description": "Please select the time blocks that work best for you"
+    },
+    "buttons": {
+      "next": "Next",
+      "back": "Back",
+      "submit": "Submit Intake Form",
+      "submitting": "Submitting..."
+    },
+    "validation": {
+      "nameMin": "Name must be at least 2 characters",
+      "emailInvalid": "Please enter a valid email",
+      "phoneInvalid": "Please enter a valid phone number",
+      "dobRequired": "Date of birth is required",
+      "gradeRequired": "Grade is required",
+      "languagesRequired": "Please specify languages spoken",
+      "concernsRequired": "Please select at least one concern",
+      "supportsRequired": "Please select current supports",
+      "observationsRequired": "Please describe what you're noticing",
+      "goalRequired": "Please select your primary goal",
+      "consentScreening": "You must consent to screening",
+      "consentData": "You must consent to data storage"
+    },
+    "success": {
+      "title": "Intake form submitted!",
+      "description": "Now let's schedule your screening session."
+    },
+    "error": {
+      "title": "Error submitting form",
+      "description": "Please try again."
+    }
+  },
+  "languages": {
+    "en": "English",
+    "es": "Español",
+    "pt": "Português"
+  }
+}

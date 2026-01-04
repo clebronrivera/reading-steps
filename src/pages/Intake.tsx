@@ -29,68 +29,72 @@ import {
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2, ArrowRight, ArrowLeft } from "lucide-react";
+import { useLanguage } from "@/hooks/useLanguage";
+import { LanguageSelector } from "@/components/LanguageSelector";
 
-const concerns = [
-  { id: "letter_names", label: "Letter Names (difficulty identifying letters)" },
-  { id: "letter_sounds", label: "Letter Sounds (difficulty connecting letters to sounds)" },
-  { id: "phonological_awareness", label: "Phonological Awareness (rhyming, syllables, sounds in words)" },
-  { id: "decoding", label: "Decoding (sounding out words)" },
-  { id: "fluency", label: "Fluency (slow, choppy, or inaccurate reading)" },
-  { id: "comprehension", label: "Comprehension (understanding what is read)" },
-  { id: "spelling", label: "Spelling difficulties" },
-  { id: "other", label: "Other concerns" },
-];
+// Grade keys for translation lookup
+const gradeKeys = [
+  "kindergarten", "1st", "2nd", "3rd", "4th", "5th", 
+  "6th", "7th", "8th", "9th", "10th", "11th", "12th"
+] as const;
 
-// Expanded for Item #9 - school supports checkboxes
-const schoolSupportsOptions = [
-  { id: "none", label: "None / Not currently receiving supports" },
-  { id: "mtss_rti", label: "MTSS/RTI (tiered intervention)" },
-  { id: "504", label: "504 Plan" },
-  { id: "iep", label: "IEP (Individualized Education Program)" },
-  { id: "past_evaluation", label: "Past evaluation (school or private)" },
-  { id: "tutoring", label: "Private tutoring" },
-];
+// Concern keys for translation lookup
+const concernKeys = [
+  { id: "letter_names", key: "letterNames" },
+  { id: "letter_sounds", key: "letterSounds" },
+  { id: "phonological_awareness", key: "phonological" },
+  { id: "decoding", key: "decoding" },
+  { id: "fluency", key: "fluency" },
+  { id: "comprehension", key: "comprehension" },
+  { id: "spelling", key: "spelling" },
+  { id: "other", key: "other" },
+] as const;
 
-const parentGoalOptions = [
-  { value: "school_support", label: "I want help getting support from the school" },
-  { value: "tutoring_plan", label: "I want a tutoring/intervention plan" },
-  { value: "evaluation_guidance", label: "I want guidance on whether to request a formal evaluation" },
-  { value: "full_report", label: "I want a comprehensive report I can share" },
-];
+// Support keys for translation lookup
+const supportKeys = [
+  { id: "none", key: "none" },
+  { id: "mtss_rti", key: "mtss" },
+  { id: "504", key: "504" },
+  { id: "iep", key: "iep" },
+  { id: "past_evaluation", key: "pastEval" },
+  { id: "tutoring", key: "tutoring" },
+] as const;
 
-const grades = [
-  "Kindergarten", "1st Grade", "2nd Grade", "3rd Grade", "4th Grade",
-  "5th Grade", "6th Grade", "7th Grade", "8th Grade", "9th Grade",
-  "10th Grade", "11th Grade", "12th Grade",
-];
+// Goal keys for translation lookup
+const goalKeys = [
+  { value: "school_support", key: "schoolSupport" },
+  { value: "tutoring_plan", key: "tutoringPlan" },
+  { value: "evaluation_guidance", key: "evalGuidance" },
+  { value: "full_report", key: "fullReport" },
+] as const;
 
 const intakeSchema = z.object({
   // Parent info
-  parentName: z.string().min(2, "Name must be at least 2 characters").max(100),
-  parentEmail: z.string().email("Please enter a valid email").max(255),
-  parentPhone: z.string().min(10, "Please enter a valid phone number").max(20),
+  parentName: z.string().min(2).max(100),
+  parentEmail: z.string().email().max(255),
+  parentPhone: z.string().min(10).max(20),
   // Student info
-  studentName: z.string().min(2, "Name must be at least 2 characters").max(100),
-  studentDob: z.string().min(1, "Date of birth is required"),
-  studentGrade: z.string().min(1, "Grade is required"),
+  studentName: z.string().min(2).max(100),
+  studentDob: z.string().min(1),
+  studentGrade: z.string().min(1),
   studentSchool: z.string().max(200).optional(),
-  languagesAtHome: z.string().min(1, "Please specify languages spoken"),
-  // NEW: Language/learning context (Item #9)
+  languagesAtHome: z.string().min(1),
+  // Language/learning context
   elStatus: z.boolean().optional(),
   speechLanguageHistory: z.string().max(1000).optional(),
   visionHearingStatus: z.string().max(500).optional(),
   attendanceConcerns: z.boolean().optional(),
   // Concerns
-  primaryConcerns: z.array(z.string()).min(1, "Please select at least one concern"),
-  // NEW: Expanded school supports (Item #9)
-  schoolSupportsStatus: z.array(z.string()).min(1, "Please select current supports"),
+  primaryConcerns: z.array(z.string()).min(1),
+  // School supports
+  schoolSupportsStatus: z.array(z.string()).min(1),
   interventionsTried: z.string().max(2000).optional(),
-  parentObservations: z.string().min(10, "Please describe what you're noticing").max(2000),
-  // NEW: Parent goal (Item #9)
-  parentGoal: z.string().min(1, "Please select your primary goal"),
+  parentObservations: z.string().min(10).max(2000),
+  // Parent goal
+  parentGoal: z.string().min(1),
   // Consent
-  consentScreening: z.boolean().refine(val => val === true, "You must consent to screening"),
-  consentStoreData: z.boolean().refine(val => val === true, "You must consent to data storage"),
+  consentScreening: z.boolean().refine(val => val === true),
+  consentStoreData: z.boolean().refine(val => val === true),
   consentRecordZoom: z.boolean().optional(),
 });
 
@@ -99,10 +103,10 @@ type IntakeFormData = z.infer<typeof intakeSchema>;
 export default function Intake() {
   const [step, setStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [studentId, setStudentId] = useState<string | null>(null);
-  const [honeypot, setHoneypot] = useState(""); // Hidden bot trap field
+  const [honeypot, setHoneypot] = useState("");
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { language, setLanguage, t } = useLanguage();
 
   const form = useForm<IntakeFormData>({
     resolver: zodResolver(intakeSchema),
@@ -133,7 +137,6 @@ export default function Intake() {
   const onSubmit = async (data: IntakeFormData) => {
     setIsSubmitting(true);
     try {
-      // Call secure edge function with rate limiting
       const { data: response, error } = await supabase.functions.invoke('public-intake', {
         body: {
           type: 'intake',
@@ -145,7 +148,6 @@ export default function Intake() {
           studentGrade: data.studentGrade,
           studentSchool: data.studentSchool || undefined,
           languagesAtHome: data.languagesAtHome,
-          // New fields for Item #9
           elStatus: data.elStatus,
           speechLanguageHistory: data.speechLanguageHistory,
           visionHearingStatus: data.visionHearingStatus,
@@ -158,7 +160,8 @@ export default function Intake() {
           consentScreening: data.consentScreening,
           consentStoreData: data.consentStoreData,
           consentRecordZoom: data.consentRecordZoom,
-          honeypot: honeypot, // Bot trap
+          honeypot: honeypot,
+          preferredLanguage: language,
         }
       });
 
@@ -168,18 +171,16 @@ export default function Intake() {
         throw new Error(response?.error || 'Failed to submit intake form');
       }
 
-      setStudentId(response.studentId);
       toast({
-        title: "Intake form submitted!",
-        description: "Now let's schedule your screening session.",
+        title: t.intake.success.title,
+        description: t.intake.success.description,
       });
       
-      // Navigate to scheduling with student ID
       navigate(`/schedule?studentId=${response.studentId}`);
     } catch (error: any) {
       toast({
-        title: "Error submitting form",
-        description: error.message || "Please try again.",
+        title: t.intake.error.title,
+        description: error.message || t.intake.error.description,
         variant: "destructive",
       });
     } finally {
@@ -212,11 +213,14 @@ export default function Intake() {
     <PublicLayout>
       <section className="py-12 md:py-20">
         <div className="container max-w-2xl">
+          {/* Language Selector */}
+          <div className="flex justify-end mb-4">
+            <LanguageSelector value={language} onChange={setLanguage} />
+          </div>
+
           <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold mb-4">Intake Form</h1>
-            <p className="text-muted-foreground">
-              Complete this form to book your free reading screening session.
-            </p>
+            <h1 className="text-3xl font-bold mb-4">{t.intake.title}</h1>
+            <p className="text-muted-foreground">{t.intake.subtitle}</p>
           </div>
 
           {/* Progress Steps */}
@@ -235,11 +239,7 @@ export default function Intake() {
                   {s}
                 </div>
                 {s < 4 && (
-                  <div
-                    className={`w-8 md:w-12 h-0.5 ${
-                      s < step ? "bg-primary" : "bg-muted"
-                    }`}
-                  />
+                  <div className={`w-8 md:w-12 h-0.5 ${s < step ? "bg-primary" : "bg-muted"}`} />
                 )}
               </div>
             ))}
@@ -250,14 +250,14 @@ export default function Intake() {
               <Card className="card-elevated border-0">
                 <CardHeader>
                   <CardTitle>
-                    {step === 1 && "Parent/Guardian Information"}
-                    {step === 2 && "Student Information"}
-                    {step === 3 && "Reading Concerns & Goals"}
-                    {step === 4 && "Consent & Submit"}
+                    {step === 1 && t.intake.steps.parentInfo}
+                    {step === 2 && t.intake.steps.studentInfo}
+                    {step === 3 && t.intake.steps.concerns}
+                    {step === 4 && t.intake.steps.consent}
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-6">
-                  {/* Honeypot field - hidden from users, visible to bots */}
+                  {/* Honeypot field */}
                   <div style={{ position: 'absolute', left: '-9999px', opacity: 0 }} aria-hidden="true">
                     <label htmlFor="website">Website</label>
                     <input 
@@ -279,9 +279,9 @@ export default function Intake() {
                         name="parentName"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Full Name *</FormLabel>
+                            <FormLabel>{t.intake.parent.fullName} *</FormLabel>
                             <FormControl>
-                              <Input placeholder="Your full name" {...field} />
+                              <Input placeholder={t.intake.parent.fullNamePlaceholder} {...field} />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -292,9 +292,9 @@ export default function Intake() {
                         name="parentEmail"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Email Address *</FormLabel>
+                            <FormLabel>{t.intake.parent.email} *</FormLabel>
                             <FormControl>
-                              <Input type="email" placeholder="your@email.com" {...field} />
+                              <Input type="email" placeholder={t.intake.parent.emailPlaceholder} {...field} />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -305,9 +305,9 @@ export default function Intake() {
                         name="parentPhone"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Phone Number *</FormLabel>
+                            <FormLabel>{t.intake.parent.phone} *</FormLabel>
                             <FormControl>
-                              <Input type="tel" placeholder="(555) 123-4567" {...field} />
+                              <Input type="tel" placeholder={t.intake.parent.phonePlaceholder} {...field} />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -316,7 +316,7 @@ export default function Intake() {
                     </>
                   )}
 
-                  {/* Step 2: Student Info (expanded for Item #9) */}
+                  {/* Step 2: Student Info */}
                   {step === 2 && (
                     <>
                       <FormField
@@ -324,9 +324,9 @@ export default function Intake() {
                         name="studentName"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Student's Full Name *</FormLabel>
+                            <FormLabel>{t.intake.student.fullName} *</FormLabel>
                             <FormControl>
-                              <Input placeholder="Child's full name" {...field} />
+                              <Input placeholder={t.intake.student.fullNamePlaceholder} {...field} />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -338,7 +338,7 @@ export default function Intake() {
                           name="studentDob"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>Date of Birth *</FormLabel>
+                              <FormLabel>{t.intake.student.dob} *</FormLabel>
                               <FormControl>
                                 <Input type="date" {...field} />
                               </FormControl>
@@ -351,17 +351,17 @@ export default function Intake() {
                           name="studentGrade"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>Current Grade *</FormLabel>
+                              <FormLabel>{t.intake.student.grade} *</FormLabel>
                               <Select onValueChange={field.onChange} value={field.value}>
                                 <FormControl>
                                   <SelectTrigger>
-                                    <SelectValue placeholder="Select grade" />
+                                    <SelectValue placeholder={t.intake.student.gradePlaceholder} />
                                   </SelectTrigger>
                                 </FormControl>
                                 <SelectContent>
-                                  {grades.map((grade) => (
-                                    <SelectItem key={grade} value={grade}>
-                                      {grade}
+                                  {gradeKeys.map((gradeKey) => (
+                                    <SelectItem key={gradeKey} value={gradeKey}>
+                                      {t.intake.grades[gradeKey]}
                                     </SelectItem>
                                   ))}
                                 </SelectContent>
@@ -376,9 +376,9 @@ export default function Intake() {
                         name="studentSchool"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>School Name (optional)</FormLabel>
+                            <FormLabel>{t.intake.student.school}</FormLabel>
                             <FormControl>
-                              <Input placeholder="Current school" {...field} />
+                              <Input placeholder={t.intake.student.schoolPlaceholder} {...field} />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -389,13 +389,11 @@ export default function Intake() {
                         name="languagesAtHome"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Languages Spoken at Home *</FormLabel>
+                            <FormLabel>{t.intake.student.languages} *</FormLabel>
                             <FormControl>
-                              <Input placeholder="e.g., English, Spanish" {...field} />
+                              <Input placeholder={t.intake.student.languagesPlaceholder} {...field} />
                             </FormControl>
-                            <FormDescription>
-                              Separate multiple languages with commas
-                            </FormDescription>
+                            <FormDescription>{t.intake.student.languagesDescription}</FormDescription>
                             <FormMessage />
                           </FormItem>
                         )}
@@ -403,7 +401,7 @@ export default function Intake() {
                       
                       {/* Language/Learning Context Fields */}
                       <div className="pt-4 border-t">
-                        <h4 className="font-medium mb-4">Language & Learning Context</h4>
+                        <h4 className="font-medium mb-4">{t.intake.learningContext.title}</h4>
                         <div className="space-y-4">
                           <FormField
                             control={form.control}
@@ -411,15 +409,10 @@ export default function Intake() {
                             render={({ field }) => (
                               <FormItem className="flex items-start gap-3 space-y-0">
                                 <FormControl>
-                                  <Checkbox
-                                    checked={field.value}
-                                    onCheckedChange={field.onChange}
-                                  />
+                                  <Checkbox checked={field.value} onCheckedChange={field.onChange} />
                                 </FormControl>
                                 <div>
-                                  <FormLabel className="font-normal">
-                                    Currently or previously classified as English Learner (EL/ELL)
-                                  </FormLabel>
+                                  <FormLabel className="font-normal">{t.intake.learningContext.elStatus}</FormLabel>
                                 </div>
                               </FormItem>
                             )}
@@ -429,14 +422,15 @@ export default function Intake() {
                             name="speechLanguageHistory"
                             render={({ field }) => (
                               <FormItem>
-                                <FormLabel>Speech/Language History (optional)</FormLabel>
+                                <FormLabel>{t.intake.learningContext.speechHistory}</FormLabel>
                                 <FormControl>
                                   <Textarea
-                                    placeholder="Any speech therapy, language delays, or articulation concerns..."
+                                    placeholder={t.intake.learningContext.speechHistoryPlaceholder}
                                     className="min-h-[80px]"
                                     {...field}
                                   />
                                 </FormControl>
+                                <FormDescription>{t.intake.learningContext.speechHistoryDescription}</FormDescription>
                               </FormItem>
                             )}
                           />
@@ -445,13 +439,11 @@ export default function Intake() {
                             name="visionHearingStatus"
                             render={({ field }) => (
                               <FormItem>
-                                <FormLabel>Vision/Hearing Screening Status (optional)</FormLabel>
+                                <FormLabel>{t.intake.learningContext.visionHearing}</FormLabel>
                                 <FormControl>
-                                  <Input 
-                                    placeholder="e.g., Passed school screening, wears glasses, failed hearing test"
-                                    {...field}
-                                  />
+                                  <Input placeholder={t.intake.learningContext.visionHearingPlaceholder} {...field} />
                                 </FormControl>
+                                <FormDescription>{t.intake.learningContext.visionHearingDescription}</FormDescription>
                               </FormItem>
                             )}
                           />
@@ -461,15 +453,10 @@ export default function Intake() {
                             render={({ field }) => (
                               <FormItem className="flex items-start gap-3 space-y-0">
                                 <FormControl>
-                                  <Checkbox
-                                    checked={field.value}
-                                    onCheckedChange={field.onChange}
-                                  />
+                                  <Checkbox checked={field.value} onCheckedChange={field.onChange} />
                                 </FormControl>
                                 <div>
-                                  <FormLabel className="font-normal">
-                                    Significant attendance concerns (missed 10+ days this year)
-                                  </FormLabel>
+                                  <FormLabel className="font-normal">{t.intake.learningContext.attendance}</FormLabel>
                                 </div>
                               </FormItem>
                             )}
@@ -479,7 +466,7 @@ export default function Intake() {
                     </>
                   )}
 
-                  {/* Step 3: Concerns & Goals (expanded for Item #9) */}
+                  {/* Step 3: Concerns & Goals */}
                   {step === 3 && (
                     <>
                       <FormField
@@ -487,12 +474,10 @@ export default function Intake() {
                         name="primaryConcerns"
                         render={() => (
                           <FormItem>
-                            <FormLabel>Primary Concerns *</FormLabel>
-                            <FormDescription>
-                              Select all areas where you've noticed difficulties
-                            </FormDescription>
+                            <FormLabel>{t.intake.concerns.title} *</FormLabel>
+                            <FormDescription>{t.intake.concerns.description}</FormDescription>
                             <div className="grid gap-3 mt-2">
-                              {concerns.map((concern) => (
+                              {concernKeys.map((concern) => (
                                 <FormField
                                   key={concern.id}
                                   control={form.control}
@@ -507,15 +492,13 @@ export default function Intake() {
                                             if (checked) {
                                               field.onChange([...value, concern.id]);
                                             } else {
-                                              field.onChange(
-                                                value.filter((v) => v !== concern.id)
-                                              );
+                                              field.onChange(value.filter((v) => v !== concern.id));
                                             }
                                           }}
                                         />
                                       </FormControl>
                                       <Label className="font-normal cursor-pointer">
-                                        {concern.label}
+                                        {t.intake.concerns[concern.key as keyof typeof t.intake.concerns]}
                                       </Label>
                                     </FormItem>
                                   )}
@@ -527,18 +510,16 @@ export default function Intake() {
                         )}
                       />
 
-                      {/* School Supports Status - Multi-select */}
+                      {/* School Supports Status */}
                       <FormField
                         control={form.control}
                         name="schoolSupportsStatus"
                         render={() => (
                           <FormItem>
-                            <FormLabel>Current School Supports *</FormLabel>
-                            <FormDescription>
-                              Select all that currently apply or have been tried
-                            </FormDescription>
+                            <FormLabel>{t.intake.supports.title} *</FormLabel>
+                            <FormDescription>{t.intake.supports.description}</FormDescription>
                             <div className="grid gap-3 mt-2">
-                              {schoolSupportsOptions.map((support) => (
+                              {supportKeys.map((support) => (
                                 <FormField
                                   key={support.id}
                                   control={form.control}
@@ -551,24 +532,20 @@ export default function Intake() {
                                           onCheckedChange={(checked) => {
                                             const value = field.value || [];
                                             if (checked) {
-                                              // If selecting "none", clear others
                                               if (support.id === "none") {
                                                 field.onChange(["none"]);
                                               } else {
-                                                // Remove "none" if selecting other options
                                                 const filtered = value.filter(v => v !== "none");
                                                 field.onChange([...filtered, support.id]);
                                               }
                                             } else {
-                                              field.onChange(
-                                                value.filter((v) => v !== support.id)
-                                              );
+                                              field.onChange(value.filter((v) => v !== support.id));
                                             }
                                           }}
                                         />
                                       </FormControl>
                                       <Label className="font-normal cursor-pointer">
-                                        {support.label}
+                                        {t.intake.supports[support.key as keyof typeof t.intake.supports]}
                                       </Label>
                                     </FormItem>
                                   )}
@@ -585,17 +562,15 @@ export default function Intake() {
                         name="interventionsTried"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Interventions Already Tried (optional)</FormLabel>
+                            <FormLabel>{t.intake.observations.interventions}</FormLabel>
                             <FormControl>
                               <Textarea
-                                placeholder="Describe any reading programs, tutoring, or interventions that have been tried..."
+                                placeholder={t.intake.observations.interventionsPlaceholder}
                                 className="min-h-[80px]"
                                 {...field}
                               />
                             </FormControl>
-                            <FormDescription>
-                              This helps us understand what has or hasn't worked
-                            </FormDescription>
+                            <FormDescription>{t.intake.observations.interventionsDescription}</FormDescription>
                           </FormItem>
                         )}
                       />
@@ -605,17 +580,15 @@ export default function Intake() {
                         name="parentObservations"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>What are you noticing? *</FormLabel>
+                            <FormLabel>{t.intake.observations.parentObs} *</FormLabel>
                             <FormControl>
                               <Textarea
-                                placeholder="Please describe specific observations about your child's reading..."
+                                placeholder={t.intake.observations.parentObsPlaceholder}
                                 className="min-h-[120px]"
                                 {...field}
                               />
                             </FormControl>
-                            <FormDescription>
-                              Share any specific examples or patterns you've observed
-                            </FormDescription>
+                            <FormDescription>{t.intake.observations.parentObsDescription}</FormDescription>
                             <FormMessage />
                           </FormItem>
                         )}
@@ -627,24 +600,21 @@ export default function Intake() {
                         name="parentGoal"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>What is your primary goal? *</FormLabel>
+                            <FormLabel>{t.intake.goal.title} *</FormLabel>
                             <Select onValueChange={field.onChange} value={field.value}>
                               <FormControl>
                                 <SelectTrigger>
-                                  <SelectValue placeholder="Select your main goal" />
+                                  <SelectValue placeholder={t.intake.goal.title} />
                                 </SelectTrigger>
                               </FormControl>
                               <SelectContent>
-                                {parentGoalOptions.map((goal) => (
+                                {goalKeys.map((goal) => (
                                   <SelectItem key={goal.value} value={goal.value}>
-                                    {goal.label}
+                                    {t.intake.goal[goal.key as keyof typeof t.intake.goal]}
                                   </SelectItem>
                                 ))}
                               </SelectContent>
                             </Select>
-                            <FormDescription>
-                              This helps us tailor our recommendations to your needs
-                            </FormDescription>
                             <FormMessage />
                           </FormItem>
                         )}
@@ -657,8 +627,9 @@ export default function Intake() {
                     <>
                       <div className="bg-muted/50 p-4 rounded-lg mb-6">
                         <p className="text-sm text-muted-foreground">
-                          Please review the consent statements below. All required consents 
-                          must be checked to proceed.
+                          {language === 'en' && "Please review the consent statements below. All required consents must be checked to proceed."}
+                          {language === 'es' && "Por favor revise las declaraciones de consentimiento a continuación. Todos los consentimientos requeridos deben estar marcados para continuar."}
+                          {language === 'pt' && "Por favor, revise as declarações de consentimento abaixo. Todos os consentimentos obrigatórios devem ser marcados para continuar."}
                         </p>
                       </div>
                       <FormField
@@ -667,20 +638,11 @@ export default function Intake() {
                         render={({ field }) => (
                           <FormItem className="flex items-start gap-3 space-y-0 p-4 border rounded-lg">
                             <FormControl>
-                              <Checkbox
-                                checked={field.value}
-                                onCheckedChange={field.onChange}
-                              />
+                              <Checkbox checked={field.value} onCheckedChange={field.onChange} />
                             </FormControl>
                             <div>
-                              <FormLabel className="font-medium">
-                                Consent to Screening *
-                              </FormLabel>
-                              <FormDescription>
-                                I consent to my child participating in this educational 
-                                reading screening. I understand this is a screening to identify 
-                                skill patterns and risk—it does not diagnose a disability.
-                              </FormDescription>
+                              <FormLabel className="font-medium">{t.intake.consent.screeningTitle} *</FormLabel>
+                              <FormDescription>{t.intake.consent.screeningText}</FormDescription>
                               <FormMessage />
                             </div>
                           </FormItem>
@@ -692,20 +654,11 @@ export default function Intake() {
                         render={({ field }) => (
                           <FormItem className="flex items-start gap-3 space-y-0 p-4 border rounded-lg">
                             <FormControl>
-                              <Checkbox
-                                checked={field.value}
-                                onCheckedChange={field.onChange}
-                              />
+                              <Checkbox checked={field.value} onCheckedChange={field.onChange} />
                             </FormControl>
                             <div>
-                              <FormLabel className="font-medium">
-                                Consent to Store Data *
-                              </FormLabel>
-                              <FormDescription>
-                                I consent to the storage of the information provided in 
-                                this form and any data collected during the screening 
-                                session, as described in the Privacy Policy.
-                              </FormDescription>
+                              <FormLabel className="font-medium">{t.intake.consent.dataTitle} *</FormLabel>
+                              <FormDescription>{t.intake.consent.dataText}</FormDescription>
                               <FormMessage />
                             </div>
                           </FormItem>
@@ -717,34 +670,23 @@ export default function Intake() {
                         render={({ field }) => (
                           <FormItem className="flex items-start gap-3 space-y-0 p-4 border rounded-lg bg-muted/30">
                             <FormControl>
-                              <Checkbox
-                                checked={field.value}
-                                onCheckedChange={field.onChange}
-                              />
+                              <Checkbox checked={field.value} onCheckedChange={field.onChange} />
                             </FormControl>
                             <div>
-                              <FormLabel className="font-medium">
-                                Consent to Audio Recording (optional)
-                              </FormLabel>
-                              <FormDescription>
-                                I consent to audio being recorded during the session for 
-                                scoring verification purposes. Recordings are subject to 
-                                retention limits and are not shared with third parties.
-                              </FormDescription>
+                              <FormLabel className="font-medium">{t.intake.consent.recordTitle}</FormLabel>
+                              <FormDescription>{t.intake.consent.recordText}</FormDescription>
                             </div>
                           </FormItem>
                         )}
                       />
 
-                      {/* Parent Presence Requirement (Item #18) */}
+                      {/* Parent Presence Requirement */}
                       <div className="p-4 border-2 border-primary/20 rounded-lg bg-primary/5">
-                        <p className="text-sm font-medium text-primary mb-2">
-                          📋 Session Requirement
-                        </p>
+                        <p className="text-sm font-medium text-primary mb-2">📋 {language === 'en' ? 'Session Requirement' : language === 'es' ? 'Requisito de la Sesión' : 'Requisito da Sessão'}</p>
                         <p className="text-sm text-muted-foreground">
-                          A parent/guardian must be present for the full 30-minute session. 
-                          Please ensure you have a quiet space with minimal distractions 
-                          and that your camera shows your child clearly.
+                          {language === 'en' && "A parent/guardian must be present for the full 30-minute session. Please ensure you have a quiet space with minimal distractions and that your camera shows your child clearly."}
+                          {language === 'es' && "Un padre/tutor debe estar presente durante toda la sesión de 30 minutos. Asegúrese de tener un espacio tranquilo con mínimas distracciones y que su cámara muestre claramente a su hijo/a."}
+                          {language === 'pt' && "Um pai/responsável deve estar presente durante toda a sessão de 30 minutos. Certifique-se de ter um espaço tranquilo com mínimas distrações e que sua câmera mostre seu filho(a) claramente."}
                         </p>
                       </div>
                     </>
@@ -755,14 +697,14 @@ export default function Intake() {
                     {step > 1 ? (
                       <Button type="button" variant="outline" onClick={prevStep}>
                         <ArrowLeft className="h-4 w-4 mr-2" />
-                        Previous
+                        {t.intake.buttons.back}
                       </Button>
                     ) : (
                       <div />
                     )}
                     {step < 4 ? (
                       <Button type="button" onClick={nextStep}>
-                        Next
+                        {t.intake.buttons.next}
                         <ArrowRight className="h-4 w-4 ml-2" />
                       </Button>
                     ) : (
@@ -774,11 +716,11 @@ export default function Intake() {
                         {isSubmitting ? (
                           <>
                             <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                            Submitting...
+                            {t.intake.buttons.submitting}
                           </>
                         ) : (
                           <>
-                            Submit & Book Session
+                            {t.intake.buttons.submit}
                             <ArrowRight className="h-4 w-4 ml-2" />
                           </>
                         )}

@@ -1,0 +1,167 @@
+{
+  "intake": {
+    "title": "Formulario de Admisión",
+    "subtitle": "Complete este formulario para reservar su sesión gratuita de evaluación de lectura.",
+    "steps": {
+      "parentInfo": "Información del Padre/Tutor",
+      "studentInfo": "Información del Estudiante",
+      "concerns": "Preocupaciones de Lectura y Objetivos",
+      "consent": "Consentimiento y Enviar"
+    },
+    "parent": {
+      "fullName": "Nombre Completo",
+      "fullNamePlaceholder": "Su nombre completo",
+      "email": "Correo Electrónico",
+      "emailPlaceholder": "su@correo.com",
+      "phone": "Número de Teléfono",
+      "phonePlaceholder": "(555) 123-4567",
+      "relationship": "Relación con el Estudiante",
+      "relationships": {
+        "mother": "Madre",
+        "father": "Padre",
+        "grandparent": "Abuelo/Abuela",
+        "guardian": "Tutor Legal",
+        "sibling": "Hermano/Hermana",
+        "other": "Otro"
+      }
+    },
+    "student": {
+      "fullName": "Nombre Completo del Estudiante",
+      "fullNamePlaceholder": "Nombre completo del niño/a",
+      "dob": "Fecha de Nacimiento",
+      "grade": "Grado Actual",
+      "gradePlaceholder": "Seleccione el grado",
+      "school": "Nombre de la Escuela (opcional)",
+      "schoolPlaceholder": "Escuela actual",
+      "languages": "Idiomas Hablados en Casa",
+      "languagesPlaceholder": "ej., Inglés, Español",
+      "languagesDescription": "Separe varios idiomas con comas"
+    },
+    "grades": {
+      "kindergarten": "Kindergarten",
+      "1st": "1er Grado",
+      "2nd": "2do Grado",
+      "3rd": "3er Grado",
+      "4th": "4to Grado",
+      "5th": "5to Grado",
+      "6th": "6to Grado",
+      "7th": "7mo Grado",
+      "8th": "8vo Grado",
+      "9th": "9no Grado",
+      "10th": "10mo Grado",
+      "11th": "11vo Grado",
+      "12th": "12vo Grado"
+    },
+    "learningContext": {
+      "title": "Contexto de Idioma y Aprendizaje",
+      "elStatus": "Actualmente o previamente clasificado como Estudiante de Inglés (EL/ELL)",
+      "speechHistory": "Historial de Habla/Lenguaje",
+      "speechHistoryPlaceholder": "Cualquier terapia del habla, retrasos del lenguaje, etc.",
+      "speechHistoryDescription": "Anote cualquier terapia del habla, retrasos del lenguaje o preocupaciones de comunicación",
+      "visionHearing": "Estado de Visión y Audición",
+      "visionHearingPlaceholder": "ej., Pasó la evaluación escolar, usa lentes",
+      "visionHearingDescription": "¿Cuándo fueron revisados por última vez? ¿Alguna preocupación?",
+      "attendance": "Ausencias frecuentes o cambios de escuela que pueden haber afectado el aprendizaje"
+    },
+    "concerns": {
+      "title": "Principales Preocupaciones de Lectura",
+      "description": "Seleccione todas las que apliquen",
+      "letterNames": "Nombres de Letras (dificultad para identificar letras)",
+      "letterSounds": "Sonidos de Letras (dificultad para conectar letras con sonidos)",
+      "phonological": "Conciencia Fonológica (rimas, sílabas, sonidos en palabras)",
+      "decoding": "Decodificación (pronunciar palabras)",
+      "fluency": "Fluidez (lectura lenta, entrecortada o inexacta)",
+      "comprehension": "Comprensión (entender lo que se lee)",
+      "spelling": "Dificultades de ortografía",
+      "other": "Otras preocupaciones"
+    },
+    "supports": {
+      "title": "Apoyos Escolares Actuales",
+      "description": "¿Qué apoyos está recibiendo actualmente el estudiante?",
+      "none": "Ninguno / No recibe apoyos actualmente",
+      "mtss": "MTSS/RTI (intervención escalonada)",
+      "504": "Plan 504",
+      "iep": "IEP (Programa de Educación Individualizado)",
+      "pastEval": "Evaluación anterior (escolar o privada)",
+      "tutoring": "Tutoría privada"
+    },
+    "observations": {
+      "interventions": "Intervenciones Anteriores Probadas",
+      "interventionsPlaceholder": "Describa cualquier programa de lectura, tutoría o intervenciones que se hayan probado...",
+      "interventionsDescription": "¿Qué se ha intentado en casa o en la escuela?",
+      "parentObs": "¿Qué está notando?",
+      "parentObsPlaceholder": "Describa comportamientos específicos de lectura que ha observado...",
+      "parentObsDescription": "Comparta ejemplos específicos de los desafíos de lectura que ha observado"
+    },
+    "goal": {
+      "title": "¿Cuál es su objetivo principal para esta evaluación?",
+      "schoolSupport": "Quiero ayuda para obtener apoyo de la escuela",
+      "tutoringPlan": "Quiero un plan de tutoría/intervención",
+      "evalGuidance": "Quiero orientación sobre si solicitar una evaluación formal",
+      "fullReport": "Quiero un informe completo que pueda compartir"
+    },
+    "otherConcerns": {
+      "title": "Por favor marque cualquier otra área específica de preocupación",
+      "description": "Seleccione todas las que apliquen",
+      "math": "Dificultad con Matemáticas (Contar, cálculos, problemas verbales)",
+      "social": "Habilidades Sociales (Dificultad para hacer amigos, entender señales sociales)",
+      "speech": "Habla y Lenguaje (Articulación, tartamudeo, vocabulario limitado)",
+      "anxiety": "Ansiedad (Preocupación excesiva por la escuela o el rendimiento)",
+      "avoidance": "Evitación (Se niega a ir a la escuela o participar en tareas de aprendizaje)",
+      "sensory": "Problemas Sensoriales (Sensible a ruidos fuertes, texturas o luces)"
+    },
+    "additionalInfo": "¿Hay algo más que debamos saber?",
+    "additionalInfoPlaceholder": "Cualquier información adicional que pueda ser útil...",
+    "consent": {
+      "screeningTitle": "Consentimiento para la Evaluación",
+      "screeningText": "Entiendo que esto es una evaluación educativa, no un diagnóstico clínico. Doy mi consentimiento para que mi hijo/a participe en esta sesión virtual de evaluación de lectura.",
+      "dataTitle": "Consentimiento para Almacenamiento de Datos",
+      "dataText": "Doy mi consentimiento para que los resultados de la evaluación y los datos de la sesión se almacenen de forma segura para generar informes y recomendaciones.",
+      "recordTitle": "Opcional: Consentimiento para Grabación de la Sesión",
+      "recordText": "Doy mi consentimiento para que la sesión de Zoom sea grabada para fines de garantía de calidad y capacitación. Las grabaciones se almacenan de forma segura y se eliminan después de 30 días."
+    },
+    "session": {
+      "formatTitle": "Formato de Sesión Preferido",
+      "online": "En Línea / Remoto",
+      "inPerson": "Presencial",
+      "inPersonNote": "Nota: Las evaluaciones presenciales se realizarán en un espacio designado de la biblioteca para garantizar un ambiente tranquilo y neutral."
+    },
+    "availability": {
+      "title": "Disponibilidad",
+      "description": "Por favor seleccione los bloques de tiempo que mejor le funcionan"
+    },
+    "buttons": {
+      "next": "Siguiente",
+      "back": "Atrás",
+      "submit": "Enviar Formulario de Admisión",
+      "submitting": "Enviando..."
+    },
+    "validation": {
+      "nameMin": "El nombre debe tener al menos 2 caracteres",
+      "emailInvalid": "Por favor ingrese un correo electrónico válido",
+      "phoneInvalid": "Por favor ingrese un número de teléfono válido",
+      "dobRequired": "La fecha de nacimiento es requerida",
+      "gradeRequired": "El grado es requerido",
+      "languagesRequired": "Por favor especifique los idiomas hablados",
+      "concernsRequired": "Por favor seleccione al menos una preocupación",
+      "supportsRequired": "Por favor seleccione los apoyos actuales",
+      "observationsRequired": "Por favor describa lo que está notando",
+      "goalRequired": "Por favor seleccione su objetivo principal",
+      "consentScreening": "Debe dar su consentimiento para la evaluación",
+      "consentData": "Debe dar su consentimiento para el almacenamiento de datos"
+    },
+    "success": {
+      "title": "¡Formulario de admisión enviado!",
+      "description": "Ahora programemos su sesión de evaluación."
+    },
+    "error": {
+      "title": "Error al enviar el formulario",
+      "description": "Por favor intente nuevamente."
+    }
+  },
+  "languages": {
+    "en": "English",
+    "es": "Español",
+    "pt": "Português"
+  }
+}
