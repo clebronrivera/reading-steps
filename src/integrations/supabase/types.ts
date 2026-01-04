@@ -88,6 +88,41 @@ export type Database = {
         }
         Relationships: []
       }
+      intake_documents: {
+        Row: {
+          document_type: string
+          file_name: string
+          file_url: string
+          id: string
+          student_id: string
+          uploaded_at: string
+        }
+        Insert: {
+          document_type: string
+          file_name: string
+          file_url: string
+          id?: string
+          student_id: string
+          uploaded_at?: string
+        }
+        Update: {
+          document_type?: string
+          file_name?: string
+          file_url?: string
+          id?: string
+          student_id?: string
+          uploaded_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "intake_documents_student_id_fkey"
+            columns: ["student_id"]
+            isOneToOne: false
+            referencedRelation: "students"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       parents: {
         Row: {
           created_at: string
@@ -117,33 +152,45 @@ export type Database = {
       }
       responses: {
         Row: {
+          automaticity: string | null
           created_at: string
+          error_type: string | null
           id: string
           item_index: number
           notes: string | null
+          qualitative_error: string | null
           response_time_ms: number | null
           score_code: Database["public"]["Enums"]["response_code"]
           session_id: string
+          strategy_tag: string | null
           subtest_id: string
         }
         Insert: {
+          automaticity?: string | null
           created_at?: string
+          error_type?: string | null
           id?: string
           item_index: number
           notes?: string | null
+          qualitative_error?: string | null
           response_time_ms?: number | null
           score_code: Database["public"]["Enums"]["response_code"]
           session_id: string
+          strategy_tag?: string | null
           subtest_id: string
         }
         Update: {
+          automaticity?: string | null
           created_at?: string
+          error_type?: string | null
           id?: string
           item_index?: number
           notes?: string | null
+          qualitative_error?: string | null
           response_time_ms?: number | null
           score_code?: Database["public"]["Enums"]["response_code"]
           session_id?: string
+          strategy_tag?: string | null
           subtest_id?: string
         }
         Relationships: [
@@ -165,45 +212,69 @@ export type Database = {
       }
       session_summaries: {
         Row: {
+          accommodations: string[] | null
+          advocacy_guidance: string | null
           created_at: string
           id: string
+          intervention_plan_home: string | null
+          intervention_plan_school: string | null
           needs_risk_indicators: string | null
           next_steps: string | null
           observations: string | null
+          progress_monitoring_plan: string | null
           recommendations_parents: string | null
           recommendations_school: string | null
+          report_tier: Database["public"]["Enums"]["report_tier"] | null
+          risk_level: Database["public"]["Enums"]["risk_level"] | null
           session_id: string
           strengths: string | null
           total_correct: number | null
           total_items: number | null
+          unlocked_at: string | null
           updated_at: string
         }
         Insert: {
+          accommodations?: string[] | null
+          advocacy_guidance?: string | null
           created_at?: string
           id?: string
+          intervention_plan_home?: string | null
+          intervention_plan_school?: string | null
           needs_risk_indicators?: string | null
           next_steps?: string | null
           observations?: string | null
+          progress_monitoring_plan?: string | null
           recommendations_parents?: string | null
           recommendations_school?: string | null
+          report_tier?: Database["public"]["Enums"]["report_tier"] | null
+          risk_level?: Database["public"]["Enums"]["risk_level"] | null
           session_id: string
           strengths?: string | null
           total_correct?: number | null
           total_items?: number | null
+          unlocked_at?: string | null
           updated_at?: string
         }
         Update: {
+          accommodations?: string[] | null
+          advocacy_guidance?: string | null
           created_at?: string
           id?: string
+          intervention_plan_home?: string | null
+          intervention_plan_school?: string | null
           needs_risk_indicators?: string | null
           next_steps?: string | null
           observations?: string | null
+          progress_monitoring_plan?: string | null
           recommendations_parents?: string | null
           recommendations_school?: string | null
+          report_tier?: Database["public"]["Enums"]["report_tier"] | null
+          risk_level?: Database["public"]["Enums"]["risk_level"] | null
           session_id?: string
           strengths?: string | null
           total_correct?: number | null
           total_items?: number | null
+          unlocked_at?: string | null
           updated_at?: string
         }
         Relationships: [
@@ -221,28 +292,47 @@ export type Database = {
           appointment_id: string | null
           assessor_id: string | null
           created_at: string
+          current_subtest_id: string | null
           ended_at: string | null
           id: string
+          observations: Json | null
           started_at: string
+          status: Database["public"]["Enums"]["session_status"] | null
           student_id: string
+          validity_notes: string | null
+          validity_status: Database["public"]["Enums"]["validity_status"] | null
         }
         Insert: {
           appointment_id?: string | null
           assessor_id?: string | null
           created_at?: string
+          current_subtest_id?: string | null
           ended_at?: string | null
           id?: string
+          observations?: Json | null
           started_at?: string
+          status?: Database["public"]["Enums"]["session_status"] | null
           student_id: string
+          validity_notes?: string | null
+          validity_status?:
+            | Database["public"]["Enums"]["validity_status"]
+            | null
         }
         Update: {
           appointment_id?: string | null
           assessor_id?: string | null
           created_at?: string
+          current_subtest_id?: string | null
           ended_at?: string | null
           id?: string
+          observations?: Json | null
           started_at?: string
+          status?: Database["public"]["Enums"]["session_status"] | null
           student_id?: string
+          validity_notes?: string | null
+          validity_status?:
+            | Database["public"]["Enums"]["validity_status"]
+            | null
         }
         Relationships: [
           {
@@ -250,6 +340,13 @@ export type Database = {
             columns: ["appointment_id"]
             isOneToOne: false
             referencedRelation: "appointments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sessions_current_subtest_id_fkey"
+            columns: ["current_subtest_id"]
+            isOneToOne: false
+            referencedRelation: "subtests"
             referencedColumns: ["id"]
           },
           {
@@ -263,58 +360,85 @@ export type Database = {
       }
       students: {
         Row: {
+          attendance_concerns: boolean | null
           consent_record_zoom: boolean | null
           consent_screening: boolean
           consent_store_data: boolean
           created_at: string
           current_supports: string | null
           date_of_birth: string
+          el_status: boolean | null
           full_name: string
           grade: string
           id: string
+          interventions_tried: string | null
           languages_at_home: string[] | null
           lead_status: Database["public"]["Enums"]["lead_status"]
+          parent_goal: Database["public"]["Enums"]["parent_goal"] | null
           parent_id: string
           parent_observations: string | null
           primary_concerns: string[] | null
+          risk_flags: string[] | null
+          risk_level: Database["public"]["Enums"]["risk_level"] | null
           school: string | null
+          school_supports_status: string[] | null
+          speech_language_history: string | null
           updated_at: string
+          vision_hearing_status: string | null
         }
         Insert: {
+          attendance_concerns?: boolean | null
           consent_record_zoom?: boolean | null
           consent_screening?: boolean
           consent_store_data?: boolean
           created_at?: string
           current_supports?: string | null
           date_of_birth: string
+          el_status?: boolean | null
           full_name: string
           grade: string
           id?: string
+          interventions_tried?: string | null
           languages_at_home?: string[] | null
           lead_status?: Database["public"]["Enums"]["lead_status"]
+          parent_goal?: Database["public"]["Enums"]["parent_goal"] | null
           parent_id: string
           parent_observations?: string | null
           primary_concerns?: string[] | null
+          risk_flags?: string[] | null
+          risk_level?: Database["public"]["Enums"]["risk_level"] | null
           school?: string | null
+          school_supports_status?: string[] | null
+          speech_language_history?: string | null
           updated_at?: string
+          vision_hearing_status?: string | null
         }
         Update: {
+          attendance_concerns?: boolean | null
           consent_record_zoom?: boolean | null
           consent_screening?: boolean
           consent_store_data?: boolean
           created_at?: string
           current_supports?: string | null
           date_of_birth?: string
+          el_status?: boolean | null
           full_name?: string
           grade?: string
           id?: string
+          interventions_tried?: string | null
           languages_at_home?: string[] | null
           lead_status?: Database["public"]["Enums"]["lead_status"]
+          parent_goal?: Database["public"]["Enums"]["parent_goal"] | null
           parent_id?: string
           parent_observations?: string | null
           primary_concerns?: string[] | null
+          risk_flags?: string[] | null
+          risk_level?: Database["public"]["Enums"]["risk_level"] | null
           school?: string | null
+          school_supports_status?: string[] | null
+          speech_language_history?: string | null
           updated_at?: string
+          vision_hearing_status?: string | null
         }
         Relationships: [
           {
@@ -331,36 +455,54 @@ export type Database = {
           assessment_id: string
           created_at: string
           description: string | null
+          discontinue_rule: Json | null
+          grade: string | null
           id: string
           item_count: number | null
+          modality: Database["public"]["Enums"]["modality"] | null
+          module_type: Database["public"]["Enums"]["module_type"] | null
           name: string
           order_index: number
           script_prompt: string | null
+          stimulus_data: Json | null
           stimulus_url: string | null
+          timing_config: Json | null
           updated_at: string
         }
         Insert: {
           assessment_id: string
           created_at?: string
           description?: string | null
+          discontinue_rule?: Json | null
+          grade?: string | null
           id?: string
           item_count?: number | null
+          modality?: Database["public"]["Enums"]["modality"] | null
+          module_type?: Database["public"]["Enums"]["module_type"] | null
           name: string
           order_index?: number
           script_prompt?: string | null
+          stimulus_data?: Json | null
           stimulus_url?: string | null
+          timing_config?: Json | null
           updated_at?: string
         }
         Update: {
           assessment_id?: string
           created_at?: string
           description?: string | null
+          discontinue_rule?: Json | null
+          grade?: string | null
           id?: string
           item_count?: number | null
+          modality?: Database["public"]["Enums"]["modality"] | null
+          module_type?: Database["public"]["Enums"]["module_type"] | null
           name?: string
           order_index?: number
           script_prompt?: string | null
+          stimulus_data?: Json | null
           stimulus_url?: string | null
+          timing_config?: Json | null
           updated_at?: string
         }
         Relationships: [
@@ -428,12 +570,29 @@ export type Database = {
         | "completed"
         | "follow_up_needed"
         | "converted"
+      modality: "expressive" | "receptive"
+      module_type:
+        | "print_awareness"
+        | "phonological_awareness"
+        | "phonics"
+        | "hfw"
+        | "orf"
+        | "comprehension"
+      parent_goal:
+        | "school_support"
+        | "tutoring_plan"
+        | "evaluation_guidance"
+        | "full_report"
+      report_tier: "free" | "paid"
       response_code:
         | "correct"
         | "incorrect"
         | "self_correct"
         | "prompted"
         | "no_response"
+      risk_level: "low" | "moderate" | "high" | "critical"
+      session_status: "scheduled" | "in_progress" | "completed" | "cancelled"
+      validity_status: "valid" | "questionable" | "invalid"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -576,6 +735,22 @@ export const Constants = {
         "follow_up_needed",
         "converted",
       ],
+      modality: ["expressive", "receptive"],
+      module_type: [
+        "print_awareness",
+        "phonological_awareness",
+        "phonics",
+        "hfw",
+        "orf",
+        "comprehension",
+      ],
+      parent_goal: [
+        "school_support",
+        "tutoring_plan",
+        "evaluation_guidance",
+        "full_report",
+      ],
+      report_tier: ["free", "paid"],
       response_code: [
         "correct",
         "incorrect",
@@ -583,6 +758,9 @@ export const Constants = {
         "prompted",
         "no_response",
       ],
+      risk_level: ["low", "moderate", "high", "critical"],
+      session_status: ["scheduled", "in_progress", "completed", "cancelled"],
+      validity_status: ["valid", "questionable", "invalid"],
     },
   },
 } as const

@@ -5,20 +5,22 @@ import { PublicLayout } from "@/components/layout/PublicLayout";
 import { 
   BookOpen, 
   Calendar, 
-  Video, 
+  Monitor, 
   FileText, 
   CheckCircle2, 
   ArrowRight,
   Shield,
   Clock,
-  Heart
+  Heart,
+  AlertTriangle,
+  Gift
 } from "lucide-react";
 
 const features = [
   {
-    icon: Video,
-    title: "Virtual Sessions",
-    description: "Convenient Zoom-based screeners from the comfort of your home.",
+    icon: Monitor,
+    title: "Split-Screen Sessions",
+    description: "Clean stimulus display for students, full control panel for assessor.",
   },
   {
     icon: Clock,
@@ -27,8 +29,8 @@ const features = [
   },
   {
     icon: FileText,
-    title: "Detailed Summary",
-    description: "Receive a comprehensive summary with actionable next steps.",
+    title: "Parent Portal Access",
+    description: "View results, download summaries, and get clear next steps.",
   },
   {
     icon: Shield,
@@ -40,23 +42,23 @@ const features = [
 const steps = [
   {
     number: "1",
-    title: "Complete Intake Form",
+    title: "Free Intake",
     description: "Tell us about your child and your concerns.",
   },
   {
     number: "2",
-    title: "Schedule Session",
-    description: "Pick a convenient time for a 30-minute virtual screener.",
+    title: "Book Free Screener",
+    description: "Pick a convenient time for a 30-minute session.",
   },
   {
     number: "3",
-    title: "Join Zoom Session",
+    title: "Live Screening Session",
     description: "Your child participates in engaging reading activities.",
   },
   {
     number: "4",
-    title: "Get Your Summary",
-    description: "Receive insights, strengths, and recommendations.",
+    title: "Results + Next Steps",
+    description: "Access your Parent Portal with clear action items.",
   },
 ];
 
@@ -78,21 +80,21 @@ export default function Home() {
         <div className="container relative py-20 md:py-32">
           <div className="max-w-3xl mx-auto text-center animate-fade-in">
             <div className="inline-flex items-center gap-2 px-4 py-1.5 mb-6 rounded-full bg-secondary text-secondary-foreground text-sm font-medium">
-              <BookOpen className="h-4 w-4" />
-              Free Virtual Reading Screeners
+              <Gift className="h-4 w-4" />
+              Free Virtual Reading Screening
             </div>
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight mb-6">
               Is Your Child Struggling{" "}
               <span className="text-gradient">to Read?</span>
             </h1>
             <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
-              Get a free, 30-minute virtual reading screener with a School Psychology graduate student. 
-              Understand your child's reading development and get actionable next steps.
+              Get a free, 30-minute virtual reading screening with an Educational Specialist. 
+              Identify risk patterns early and get clear next steps.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link to="/intake">
                 <Button size="lg" className="hero-gradient border-0 text-primary-foreground hover:opacity-90 gap-2">
-                  Book a Free Screener
+                  Book Free Screener
                   <ArrowRight className="h-4 w-4" />
                 </Button>
               </Link>
@@ -102,6 +104,18 @@ export default function Home() {
                 </Button>
               </Link>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Screening Boundary Statement */}
+      <section className="py-8 bg-primary/5 border-y border-primary/10">
+        <div className="container">
+          <div className="flex items-center justify-center gap-3 text-center">
+            <AlertTriangle className="h-5 w-5 text-primary flex-shrink-0" />
+            <p className="text-sm text-muted-foreground">
+              <strong>This is a screening service</strong> to identify skill patterns and risk. It does not diagnose a disability.
+            </p>
           </div>
         </div>
       </section>
@@ -139,8 +153,8 @@ export default function Home() {
               Why Choose Our Free Screening?
             </h2>
             <p className="text-muted-foreground max-w-2xl mx-auto">
-              Our virtual reading screeners are designed to be accessible, 
-              informative, and supportive for families.
+              Our Split-Screen Assessment System delivers accurate, distraction-free 
+              screening sessions from the comfort of your home.
             </p>
           </div>
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -169,7 +183,7 @@ export default function Home() {
               How It Works
             </h2>
             <p className="text-muted-foreground">
-              Simple steps to get started with your free reading screener.
+              Simple steps to get started with your free reading screening.
             </p>
           </div>
           <div className="grid md:grid-cols-4 gap-8">
@@ -203,13 +217,13 @@ export default function Home() {
           <div className="max-w-3xl mx-auto text-center">
             <Heart className="h-12 w-12 text-primary mx-auto mb-6" />
             <h2 className="text-2xl md:text-3xl font-bold mb-4">
-              Supporting Families, One Screener at a Time
+              Supporting Families, One Screening at a Time
             </h2>
             <p className="text-muted-foreground mb-6">
-              As a School Psychology graduate student, I'm dedicated to helping families 
-              understand their children's reading development. This free screening service 
-              is designed to provide early insights and connect you with resources to support 
-              your child's literacy journey.
+              As an Educational Specialist with 16 years of experience, I'm dedicated to helping 
+              families get clear, timely information about their children's reading development. 
+              This free screening service provides early insights and connects you with resources 
+              to support your child's literacy journey.
             </p>
             <p className="text-sm text-muted-foreground italic">
               Please note: This is an educational screening service, not a diagnostic assessment. 
@@ -226,13 +240,13 @@ export default function Home() {
             Ready to Learn More About Your Child's Reading?
           </h2>
           <p className="text-primary-foreground/80 mb-8 max-w-xl mx-auto">
-            Book your free 30-minute virtual reading screener today. 
-            No cost, no obligation—just helpful insights.
+            Book your free 30-minute virtual reading screening today. 
+            No cost, no obligation—just helpful insights and clear next steps.
           </p>
           <Link to="/intake">
             <Button size="lg" variant="secondary" className="gap-2">
               <Calendar className="h-4 w-4" />
-              Book a Free Screener
+              Book Free Screener
             </Button>
           </Link>
         </div>
