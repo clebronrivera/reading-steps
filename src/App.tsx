@@ -14,6 +14,8 @@ import Intake from "./pages/Intake";
 import Schedule from "./pages/Schedule";
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
+import SessionAssessor from "./pages/SessionAssessor";
+import SessionStudent from "./pages/SessionStudent";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -39,6 +41,10 @@ const App = () => (
           
           {/* Dashboard Routes */}
           <Route path="/dashboard" element={<Dashboard />} />
+          
+          {/* Session Routes - Split Screen System */}
+          <Route path="/session/:id/assessor" element={<SessionAssessor />} />
+          <Route path="/session/:id/student" element={<SessionStudent />} />
           
           {/* Catch-all */}
           <Route path="*" element={<NotFound />} />
