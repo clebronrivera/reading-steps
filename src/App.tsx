@@ -8,6 +8,7 @@ import About from "./pages/About";
 import HowItWorks from "./pages/HowItWorks";
 import FAQ from "./pages/FAQ";
 import Privacy from "./pages/Privacy";
+import SessionLaunch from "./pages/SessionLaunch";
 import Terms from "./pages/Terms";
 import Disclaimer from "./pages/Disclaimer";
 import Intake from "./pages/Intake";
@@ -39,8 +40,9 @@ const App = () => (
           <Route path="/schedule" element={<Schedule />} />
           <Route path="/login" element={<Login />} />
           
-          {/* Dashboard Routes */}
+{/* Dashboard Routes */}
           <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/dashboard/session" element={<SessionLaunch />} />
           
           {/* Session Routes - Split Screen System */}
           <Route path="/session/:id/assessor" element={<SessionAssessor />} />
