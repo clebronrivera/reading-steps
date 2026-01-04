@@ -14,6 +14,11 @@ interface TimeSlot {
   available: boolean;
 }
 
+interface BookedSlot {
+  scheduled_at: string;
+  is_booked: boolean;
+}
+
 const SESSION_DURATION = 30;
 const BUFFER_MINUTES = 10;
 const MAX_APPOINTMENTS_PER_DAY = 3;
@@ -29,7 +34,7 @@ export default function Schedule() {
 
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [selectedTime, setSelectedTime] = useState<Date | null>(null);
-  const [existingAppointments, setExistingAppointments] = useState<any[]>([]);
+  const [existingAppointments, setExistingAppointments] = useState<BookedSlot[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isConfirmed, setIsConfirmed] = useState(false);
@@ -46,19 +51,34 @@ export default function Schedule() {
     return dates;
   }, []);
 
-  // Fetch existing appointments
+  // Fetch existing appointments via secure edge function
   useEffect(() => {
     const fetchAppointments = async () => {
       setIsLoading(true);
-      const { data, error } = await supabase
-        .from("appointments")
-        .select("scheduled_at, status")
-        .in("status", ["scheduled", "confirmed"]);
+      try {
+        const today = new Date();
+        const startDate = format(addDays(today, 1), 'yyyy-MM-dd');
+        const endDate = format(addDays(today, 15), 'yyyy-MM-dd');
 
-      if (!error && data) {
-        setExistingAppointments(data);
+        const { data, error } = await supabase.functions.invoke('public-intake', {
+          body: {
+            type: 'get_slots',
+            startDate,
+            endDate
+          }
+        });
+
+        if (error) throw error;
+        
+        if (data?.slots) {
+          setExistingAppointments(data.slots);
+        }
+      } catch (error) {
+        console.error('Error fetching slots:', error);
+        // Don't show error toast - just show all slots as available
+      } finally {
+        setIsLoading(false);
       }
-      setIsLoading(false);
     };
 
     fetchAppointments();
@@ -132,27 +152,22 @@ export default function Schedule() {
 
     setIsSubmitting(true);
     try {
-      const { data, error } = await supabase
-        .from("appointments")
-        .insert({
-          student_id: studentId,
-          scheduled_at: selectedTime.toISOString(),
-          duration_minutes: SESSION_DURATION,
+      const { data, error } = await supabase.functions.invoke('public-intake', {
+        body: {
+          type: 'schedule',
+          studentId: studentId,
+          scheduledAt: selectedTime.toISOString(),
           timezone: timezone,
-          status: "scheduled",
-        })
-        .select()
-        .single();
+        }
+      });
 
       if (error) throw error;
+      
+      if (!data?.success) {
+        throw new Error(data?.error || 'Failed to book appointment');
+      }
 
-      // Update student status
-      await supabase
-        .from("students")
-        .update({ lead_status: "scheduled" })
-        .eq("id", studentId);
-
-      setAppointmentId(data.id);
+      setAppointmentId(data.appointmentId);
       setIsConfirmed(true);
       toast({
         title: "Appointment booked!",
