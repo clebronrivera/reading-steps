@@ -17,6 +17,7 @@ import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
 import SessionAssessor from "./pages/SessionAssessor";
 import SessionStudent from "./pages/SessionStudent";
+import ParentPortal from "./pages/ParentPortal";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -39,6 +40,7 @@ const App = () => (
           <Route path="/intake" element={<Intake />} />
           <Route path="/schedule" element={<Schedule />} />
           <Route path="/login" element={<Login />} />
+          <Route path="/portal" element={<ParentPortal />} />
           
 {/* Dashboard Routes */}
           <Route path="/dashboard" element={<Dashboard />} />

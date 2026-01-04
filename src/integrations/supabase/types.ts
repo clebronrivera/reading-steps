@@ -88,6 +88,50 @@ export type Database = {
         }
         Relationships: []
       }
+      domain_scores: {
+        Row: {
+          created_at: string
+          domain: string
+          id: string
+          max_score: number | null
+          notes: string | null
+          percentile: number | null
+          raw_score: number | null
+          risk_level: Database["public"]["Enums"]["risk_level"] | null
+          session_id: string
+        }
+        Insert: {
+          created_at?: string
+          domain: string
+          id?: string
+          max_score?: number | null
+          notes?: string | null
+          percentile?: number | null
+          raw_score?: number | null
+          risk_level?: Database["public"]["Enums"]["risk_level"] | null
+          session_id: string
+        }
+        Update: {
+          created_at?: string
+          domain?: string
+          id?: string
+          max_score?: number | null
+          notes?: string | null
+          percentile?: number | null
+          raw_score?: number | null
+          risk_level?: Database["public"]["Enums"]["risk_level"] | null
+          session_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "domain_scores_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       intake_documents: {
         Row: {
           document_type: string
@@ -123,6 +167,91 @@ export type Database = {
           },
         ]
       }
+      parent_checklist_items: {
+        Row: {
+          category: string
+          completed_at: string | null
+          created_at: string
+          description: string | null
+          due_date: string | null
+          id: string
+          is_completed: boolean
+          priority: number
+          student_id: string
+          title: string
+        }
+        Insert: {
+          category: string
+          completed_at?: string | null
+          created_at?: string
+          description?: string | null
+          due_date?: string | null
+          id?: string
+          is_completed?: boolean
+          priority?: number
+          student_id: string
+          title: string
+        }
+        Update: {
+          category?: string
+          completed_at?: string | null
+          created_at?: string
+          description?: string | null
+          due_date?: string | null
+          id?: string
+          is_completed?: boolean
+          priority?: number
+          student_id?: string
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "parent_checklist_items_student_id_fkey"
+            columns: ["student_id"]
+            isOneToOne: false
+            referencedRelation: "students"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      parent_scales: {
+        Row: {
+          completed_at: string | null
+          created_at: string
+          id: string
+          responses: Json
+          scale_type: string
+          student_id: string
+          updated_at: string
+        }
+        Insert: {
+          completed_at?: string | null
+          created_at?: string
+          id?: string
+          responses?: Json
+          scale_type: string
+          student_id: string
+          updated_at?: string
+        }
+        Update: {
+          completed_at?: string | null
+          created_at?: string
+          id?: string
+          responses?: Json
+          scale_type?: string
+          student_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "parent_scales_student_id_fkey"
+            columns: ["student_id"]
+            isOneToOne: false
+            referencedRelation: "students"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       parents: {
         Row: {
           created_at: string
@@ -149,6 +278,41 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      portal_access_tokens: {
+        Row: {
+          created_at: string
+          expires_at: string
+          id: string
+          last_accessed_at: string | null
+          student_id: string
+          token_hash: string
+        }
+        Insert: {
+          created_at?: string
+          expires_at?: string
+          id?: string
+          last_accessed_at?: string | null
+          student_id: string
+          token_hash: string
+        }
+        Update: {
+          created_at?: string
+          expires_at?: string
+          id?: string
+          last_accessed_at?: string | null
+          student_id?: string
+          token_hash?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "portal_access_tokens_student_id_fkey"
+            columns: ["student_id"]
+            isOneToOne: false
+            referencedRelation: "students"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       responses: {
         Row: {
@@ -515,6 +679,56 @@ export type Database = {
           },
         ]
       }
+      teacher_input_requests: {
+        Row: {
+          completed_at: string | null
+          created_at: string
+          id: string
+          questions: Json
+          requested_by_parent_at: string
+          responses: Json | null
+          status: string
+          student_id: string
+          teacher_email: string | null
+          teacher_name: string | null
+          updated_at: string
+        }
+        Insert: {
+          completed_at?: string | null
+          created_at?: string
+          id?: string
+          questions?: Json
+          requested_by_parent_at?: string
+          responses?: Json | null
+          status?: string
+          student_id: string
+          teacher_email?: string | null
+          teacher_name?: string | null
+          updated_at?: string
+        }
+        Update: {
+          completed_at?: string | null
+          created_at?: string
+          id?: string
+          questions?: Json
+          requested_by_parent_at?: string
+          responses?: Json | null
+          status?: string
+          student_id?: string
+          teacher_email?: string | null
+          teacher_name?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "teacher_input_requests_student_id_fkey"
+            columns: ["student_id"]
+            isOneToOne: false
+            referencedRelation: "students"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_roles: {
         Row: {
           created_at: string
@@ -555,6 +769,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      validate_portal_token: { Args: { token_value: string }; Returns: string }
     }
     Enums: {
       app_role: "admin" | "assessor"
