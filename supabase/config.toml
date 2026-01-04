@@ -2,3 +2,9 @@ project_id = "llhufpdkqlhmbbfxgcrx"
 
 [functions.public-intake]
 verify_jwt = false
+
+[functions.portal-access]
+verify_jwt = false
+
+[functions.generate-report]
+verify_jwt = true

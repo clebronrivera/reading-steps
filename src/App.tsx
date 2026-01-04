@@ -18,6 +18,7 @@ import Dashboard from "./pages/Dashboard";
 import SessionAssessor from "./pages/SessionAssessor";
 import SessionStudent from "./pages/SessionStudent";
 import ParentPortal from "./pages/ParentPortal";
+import SessionReport from "./pages/SessionReport";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -49,6 +50,7 @@ const App = () => (
           {/* Session Routes - Split Screen System */}
           <Route path="/session/:id/assessor" element={<SessionAssessor />} />
           <Route path="/session/:id/student" element={<SessionStudent />} />
+          <Route path="/session/:id/report" element={<SessionReport />} />
           
           {/* Catch-all */}
           <Route path="*" element={<NotFound />} />
