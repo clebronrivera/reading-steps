@@ -35,6 +35,7 @@ import {
   AlertCircle,
   Plus
 } from "lucide-react";
+import { GenerateCoverLink } from "@/components/session/GenerateCoverLink";
 
 interface Student {
   id: string;
@@ -334,7 +335,13 @@ function SessionCard({ session, baseUrl, onCopy, getStatusBadge }: SessionCardPr
           </div>
 
           {/* URL Actions */}
-          <div className="flex flex-col sm:flex-row gap-2">
+          <div className="flex flex-col sm:flex-row gap-2 items-start sm:items-center">
+            {/* Cover Link */}
+            <GenerateCoverLink 
+              sessionId={session.id} 
+              studentName={session.students?.full_name} 
+            />
+            
             {/* Assessor URL */}
             <div className="flex items-center gap-1">
               <Input
