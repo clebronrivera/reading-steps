@@ -41,12 +41,21 @@ const concerns = [
   { id: "other", label: "Other concerns" },
 ];
 
-const supports = [
-  { value: "none", label: "None" },
-  { value: "tutoring", label: "Tutoring" },
-  { value: "mtss", label: "MTSS/RTI" },
-  { value: "iep", label: "IEP" },
-  { value: "504", label: "504 Plan" },
+// Expanded for Item #9 - school supports checkboxes
+const schoolSupportsOptions = [
+  { id: "none", label: "None / Not currently receiving supports" },
+  { id: "mtss_rti", label: "MTSS/RTI (tiered intervention)" },
+  { id: "504", label: "504 Plan" },
+  { id: "iep", label: "IEP (Individualized Education Program)" },
+  { id: "past_evaluation", label: "Past evaluation (school or private)" },
+  { id: "tutoring", label: "Private tutoring" },
+];
+
+const parentGoalOptions = [
+  { value: "school_support", label: "I want help getting support from the school" },
+  { value: "tutoring_plan", label: "I want a tutoring/intervention plan" },
+  { value: "evaluation_guidance", label: "I want guidance on whether to request a formal evaluation" },
+  { value: "full_report", label: "I want a comprehensive report I can share" },
 ];
 
 const grades = [
@@ -66,10 +75,19 @@ const intakeSchema = z.object({
   studentGrade: z.string().min(1, "Grade is required"),
   studentSchool: z.string().max(200).optional(),
   languagesAtHome: z.string().min(1, "Please specify languages spoken"),
+  // NEW: Language/learning context (Item #9)
+  elStatus: z.boolean().optional(),
+  speechLanguageHistory: z.string().max(1000).optional(),
+  visionHearingStatus: z.string().max(500).optional(),
+  attendanceConcerns: z.boolean().optional(),
   // Concerns
   primaryConcerns: z.array(z.string()).min(1, "Please select at least one concern"),
-  currentSupports: z.string().min(1, "Please select current supports"),
+  // NEW: Expanded school supports (Item #9)
+  schoolSupportsStatus: z.array(z.string()).min(1, "Please select current supports"),
+  interventionsTried: z.string().max(2000).optional(),
   parentObservations: z.string().min(10, "Please describe what you're noticing").max(2000),
+  // NEW: Parent goal (Item #9)
+  parentGoal: z.string().min(1, "Please select your primary goal"),
   // Consent
   consentScreening: z.boolean().refine(val => val === true, "You must consent to screening"),
   consentStoreData: z.boolean().refine(val => val === true, "You must consent to data storage"),
@@ -97,9 +115,15 @@ export default function Intake() {
       studentGrade: "",
       studentSchool: "",
       languagesAtHome: "",
+      elStatus: false,
+      speechLanguageHistory: "",
+      visionHearingStatus: "",
+      attendanceConcerns: false,
       primaryConcerns: [],
-      currentSupports: "",
+      schoolSupportsStatus: [],
+      interventionsTried: "",
       parentObservations: "",
+      parentGoal: "",
       consentScreening: false,
       consentStoreData: false,
       consentRecordZoom: false,
@@ -121,9 +145,16 @@ export default function Intake() {
           studentGrade: data.studentGrade,
           studentSchool: data.studentSchool || undefined,
           languagesAtHome: data.languagesAtHome,
+          // New fields for Item #9
+          elStatus: data.elStatus,
+          speechLanguageHistory: data.speechLanguageHistory,
+          visionHearingStatus: data.visionHearingStatus,
+          attendanceConcerns: data.attendanceConcerns,
           primaryConcerns: data.primaryConcerns,
-          currentSupports: data.currentSupports,
+          schoolSupportsStatus: data.schoolSupportsStatus,
+          interventionsTried: data.interventionsTried,
           parentObservations: data.parentObservations,
+          parentGoal: data.parentGoal,
           consentScreening: data.consentScreening,
           consentStoreData: data.consentStoreData,
           consentRecordZoom: data.consentRecordZoom,
@@ -164,7 +195,7 @@ export default function Intake() {
     } else if (step === 2) {
       fieldsToValidate = ["studentName", "studentDob", "studentGrade", "languagesAtHome"];
     } else if (step === 3) {
-      fieldsToValidate = ["primaryConcerns", "currentSupports", "parentObservations"];
+      fieldsToValidate = ["primaryConcerns", "schoolSupportsStatus", "parentObservations", "parentGoal"];
     }
 
     const isValid = await form.trigger(fieldsToValidate);
@@ -184,7 +215,7 @@ export default function Intake() {
           <div className="text-center mb-8">
             <h1 className="text-3xl font-bold mb-4">Intake Form</h1>
             <p className="text-muted-foreground">
-              Complete this form to schedule your free reading screening session.
+              Complete this form to book your free reading screening session.
             </p>
           </div>
 
@@ -221,7 +252,7 @@ export default function Intake() {
                   <CardTitle>
                     {step === 1 && "Parent/Guardian Information"}
                     {step === 2 && "Student Information"}
-                    {step === 3 && "Reading Concerns"}
+                    {step === 3 && "Reading Concerns & Goals"}
                     {step === 4 && "Consent & Submit"}
                   </CardTitle>
                 </CardHeader>
@@ -285,7 +316,7 @@ export default function Intake() {
                     </>
                   )}
 
-                  {/* Step 2: Student Info */}
+                  {/* Step 2: Student Info (expanded for Item #9) */}
                   {step === 2 && (
                     <>
                       <FormField
@@ -301,43 +332,45 @@ export default function Intake() {
                           </FormItem>
                         )}
                       />
-                      <FormField
-                        control={form.control}
-                        name="studentDob"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Date of Birth *</FormLabel>
-                            <FormControl>
-                              <Input type="date" {...field} />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
-                        control={form.control}
-                        name="studentGrade"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Current Grade *</FormLabel>
-                            <Select onValueChange={field.onChange} value={field.value}>
+                      <div className="grid grid-cols-2 gap-4">
+                        <FormField
+                          control={form.control}
+                          name="studentDob"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Date of Birth *</FormLabel>
                               <FormControl>
-                                <SelectTrigger>
-                                  <SelectValue placeholder="Select grade" />
-                                </SelectTrigger>
+                                <Input type="date" {...field} />
                               </FormControl>
-                              <SelectContent>
-                                {grades.map((grade) => (
-                                  <SelectItem key={grade} value={grade}>
-                                    {grade}
-                                  </SelectItem>
-                                ))}
-                              </SelectContent>
-                            </Select>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        <FormField
+                          control={form.control}
+                          name="studentGrade"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Current Grade *</FormLabel>
+                              <Select onValueChange={field.onChange} value={field.value}>
+                                <FormControl>
+                                  <SelectTrigger>
+                                    <SelectValue placeholder="Select grade" />
+                                  </SelectTrigger>
+                                </FormControl>
+                                <SelectContent>
+                                  {grades.map((grade) => (
+                                    <SelectItem key={grade} value={grade}>
+                                      {grade}
+                                    </SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </div>
                       <FormField
                         control={form.control}
                         name="studentSchool"
@@ -367,10 +400,86 @@ export default function Intake() {
                           </FormItem>
                         )}
                       />
+                      
+                      {/* Language/Learning Context Fields */}
+                      <div className="pt-4 border-t">
+                        <h4 className="font-medium mb-4">Language & Learning Context</h4>
+                        <div className="space-y-4">
+                          <FormField
+                            control={form.control}
+                            name="elStatus"
+                            render={({ field }) => (
+                              <FormItem className="flex items-start gap-3 space-y-0">
+                                <FormControl>
+                                  <Checkbox
+                                    checked={field.value}
+                                    onCheckedChange={field.onChange}
+                                  />
+                                </FormControl>
+                                <div>
+                                  <FormLabel className="font-normal">
+                                    Currently or previously classified as English Learner (EL/ELL)
+                                  </FormLabel>
+                                </div>
+                              </FormItem>
+                            )}
+                          />
+                          <FormField
+                            control={form.control}
+                            name="speechLanguageHistory"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Speech/Language History (optional)</FormLabel>
+                                <FormControl>
+                                  <Textarea
+                                    placeholder="Any speech therapy, language delays, or articulation concerns..."
+                                    className="min-h-[80px]"
+                                    {...field}
+                                  />
+                                </FormControl>
+                              </FormItem>
+                            )}
+                          />
+                          <FormField
+                            control={form.control}
+                            name="visionHearingStatus"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Vision/Hearing Screening Status (optional)</FormLabel>
+                                <FormControl>
+                                  <Input 
+                                    placeholder="e.g., Passed school screening, wears glasses, failed hearing test"
+                                    {...field}
+                                  />
+                                </FormControl>
+                              </FormItem>
+                            )}
+                          />
+                          <FormField
+                            control={form.control}
+                            name="attendanceConcerns"
+                            render={({ field }) => (
+                              <FormItem className="flex items-start gap-3 space-y-0">
+                                <FormControl>
+                                  <Checkbox
+                                    checked={field.value}
+                                    onCheckedChange={field.onChange}
+                                  />
+                                </FormControl>
+                                <div>
+                                  <FormLabel className="font-normal">
+                                    Significant attendance concerns (missed 10+ days this year)
+                                  </FormLabel>
+                                </div>
+                              </FormItem>
+                            )}
+                          />
+                        </div>
+                      </div>
                     </>
                   )}
 
-                  {/* Step 3: Concerns */}
+                  {/* Step 3: Concerns & Goals (expanded for Item #9) */}
                   {step === 3 && (
                     <>
                       <FormField
@@ -417,30 +526,80 @@ export default function Intake() {
                           </FormItem>
                         )}
                       />
+
+                      {/* School Supports Status - Multi-select */}
                       <FormField
                         control={form.control}
-                        name="currentSupports"
-                        render={({ field }) => (
+                        name="schoolSupportsStatus"
+                        render={() => (
                           <FormItem>
-                            <FormLabel>Current Supports *</FormLabel>
-                            <Select onValueChange={field.onChange} value={field.value}>
-                              <FormControl>
-                                <SelectTrigger>
-                                  <SelectValue placeholder="Select current supports" />
-                                </SelectTrigger>
-                              </FormControl>
-                              <SelectContent>
-                                {supports.map((support) => (
-                                  <SelectItem key={support.value} value={support.value}>
-                                    {support.label}
-                                  </SelectItem>
-                                ))}
-                              </SelectContent>
-                            </Select>
+                            <FormLabel>Current School Supports *</FormLabel>
+                            <FormDescription>
+                              Select all that currently apply or have been tried
+                            </FormDescription>
+                            <div className="grid gap-3 mt-2">
+                              {schoolSupportsOptions.map((support) => (
+                                <FormField
+                                  key={support.id}
+                                  control={form.control}
+                                  name="schoolSupportsStatus"
+                                  render={({ field }) => (
+                                    <FormItem className="flex items-start gap-3 space-y-0">
+                                      <FormControl>
+                                        <Checkbox
+                                          checked={field.value?.includes(support.id)}
+                                          onCheckedChange={(checked) => {
+                                            const value = field.value || [];
+                                            if (checked) {
+                                              // If selecting "none", clear others
+                                              if (support.id === "none") {
+                                                field.onChange(["none"]);
+                                              } else {
+                                                // Remove "none" if selecting other options
+                                                const filtered = value.filter(v => v !== "none");
+                                                field.onChange([...filtered, support.id]);
+                                              }
+                                            } else {
+                                              field.onChange(
+                                                value.filter((v) => v !== support.id)
+                                              );
+                                            }
+                                          }}
+                                        />
+                                      </FormControl>
+                                      <Label className="font-normal cursor-pointer">
+                                        {support.label}
+                                      </Label>
+                                    </FormItem>
+                                  )}
+                                />
+                              ))}
+                            </div>
                             <FormMessage />
                           </FormItem>
                         )}
                       />
+
+                      <FormField
+                        control={form.control}
+                        name="interventionsTried"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Interventions Already Tried (optional)</FormLabel>
+                            <FormControl>
+                              <Textarea
+                                placeholder="Describe any reading programs, tutoring, or interventions that have been tried..."
+                                className="min-h-[80px]"
+                                {...field}
+                              />
+                            </FormControl>
+                            <FormDescription>
+                              This helps us understand what has or hasn't worked
+                            </FormDescription>
+                          </FormItem>
+                        )}
+                      />
+
                       <FormField
                         control={form.control}
                         name="parentObservations"
@@ -456,6 +615,35 @@ export default function Intake() {
                             </FormControl>
                             <FormDescription>
                               Share any specific examples or patterns you've observed
+                            </FormDescription>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      {/* Parent Goal Selection */}
+                      <FormField
+                        control={form.control}
+                        name="parentGoal"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>What is your primary goal? *</FormLabel>
+                            <Select onValueChange={field.onChange} value={field.value}>
+                              <FormControl>
+                                <SelectTrigger>
+                                  <SelectValue placeholder="Select your main goal" />
+                                </SelectTrigger>
+                              </FormControl>
+                              <SelectContent>
+                                {parentGoalOptions.map((goal) => (
+                                  <SelectItem key={goal.value} value={goal.value}>
+                                    {goal.label}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                            <FormDescription>
+                              This helps us tailor our recommendations to your needs
                             </FormDescription>
                             <FormMessage />
                           </FormItem>
@@ -490,8 +678,8 @@ export default function Intake() {
                               </FormLabel>
                               <FormDescription>
                                 I consent to my child participating in this educational 
-                                reading screening. I understand this is not a diagnostic 
-                                evaluation and does not constitute healthcare.
+                                reading screening. I understand this is a screening to identify 
+                                skill patterns and risk—it does not diagnose a disability.
                               </FormDescription>
                               <FormMessage />
                             </div>
@@ -536,17 +724,29 @@ export default function Intake() {
                             </FormControl>
                             <div>
                               <FormLabel className="font-medium">
-                                Consent to Record Zoom Session (optional)
+                                Consent to Audio Recording (optional)
                               </FormLabel>
                               <FormDescription>
-                                I consent to the Zoom session being recorded for quality 
-                                improvement purposes. The recording will not be shared 
-                                with third parties.
+                                I consent to audio being recorded during the session for 
+                                scoring verification purposes. Recordings are subject to 
+                                retention limits and are not shared with third parties.
                               </FormDescription>
                             </div>
                           </FormItem>
                         )}
                       />
+
+                      {/* Parent Presence Requirement (Item #18) */}
+                      <div className="p-4 border-2 border-primary/20 rounded-lg bg-primary/5">
+                        <p className="text-sm font-medium text-primary mb-2">
+                          📋 Session Requirement
+                        </p>
+                        <p className="text-sm text-muted-foreground">
+                          A parent/guardian must be present for the full 30-minute session. 
+                          Please ensure you have a quiet space with minimal distractions 
+                          and that your camera shows your child clearly.
+                        </p>
+                      </div>
                     </>
                   )}
 
@@ -578,7 +778,7 @@ export default function Intake() {
                           </>
                         ) : (
                           <>
-                            Submit & Schedule
+                            Submit & Book Session
                             <ArrowRight className="h-4 w-4 ml-2" />
                           </>
                         )}

@@ -53,6 +53,9 @@ function sanitizeString(str: string): string {
     .trim();
 }
 
+// Validate parent goal enum
+const validParentGoals = ['school_support', 'tutoring_plan', 'evaluation_guidance', 'full_report'];
+
 interface IntakePayload {
   type: 'intake';
   parentName: string;
@@ -63,9 +66,16 @@ interface IntakePayload {
   studentGrade: string;
   studentSchool?: string;
   languagesAtHome: string;
+  // NEW: Expanded fields for Item #9
+  elStatus?: boolean;
+  speechLanguageHistory?: string;
+  visionHearingStatus?: string;
+  attendanceConcerns?: boolean;
   primaryConcerns: string[];
-  currentSupports: string;
+  schoolSupportsStatus: string[]; // Changed from single value to array
+  interventionsTried?: string;
   parentObservations: string;
+  parentGoal: string;
   consentScreening: boolean;
   consentStoreData: boolean;
   consentRecordZoom?: boolean;
@@ -221,6 +231,20 @@ Deno.serve(async (req) => {
         );
       }
 
+      if (!Array.isArray(payload.schoolSupportsStatus) || payload.schoolSupportsStatus.length === 0) {
+        return new Response(
+          JSON.stringify({ error: 'School supports selection is required' }),
+          { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+
+      if (!payload.parentGoal || !validParentGoals.includes(payload.parentGoal)) {
+        return new Response(
+          JSON.stringify({ error: 'Valid parent goal is required' }),
+          { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+
       if (!payload.consentScreening || !payload.consentStoreData) {
         return new Response(
           JSON.stringify({ error: 'Required consents must be provided' }),
@@ -238,9 +262,16 @@ Deno.serve(async (req) => {
         studentGrade: sanitizeString(payload.studentGrade),
         studentSchool: payload.studentSchool ? sanitizeString(payload.studentSchool) : null,
         languagesAtHome: sanitizeString(payload.languagesAtHome),
+        // New fields
+        elStatus: !!payload.elStatus,
+        speechLanguageHistory: payload.speechLanguageHistory ? sanitizeString(payload.speechLanguageHistory).substring(0, 1000) : null,
+        visionHearingStatus: payload.visionHearingStatus ? sanitizeString(payload.visionHearingStatus).substring(0, 500) : null,
+        attendanceConcerns: !!payload.attendanceConcerns,
         primaryConcerns: payload.primaryConcerns.map(c => sanitizeString(c)),
-        currentSupports: sanitizeString(payload.currentSupports),
+        schoolSupportsStatus: payload.schoolSupportsStatus.map(s => sanitizeString(s)),
+        interventionsTried: payload.interventionsTried ? sanitizeString(payload.interventionsTried).substring(0, 2000) : null,
         parentObservations: sanitizeString(payload.parentObservations).substring(0, 2000),
+        parentGoal: payload.parentGoal,
         consentRecordZoom: !!payload.consentRecordZoom
       };
 
@@ -263,7 +294,7 @@ Deno.serve(async (req) => {
         );
       }
 
-      // Create student
+      // Create student with expanded fields
       const { data: studentData, error: studentError } = await supabase
         .from('students')
         .insert({
@@ -273,9 +304,16 @@ Deno.serve(async (req) => {
           grade: sanitizedData.studentGrade,
           school: sanitizedData.studentSchool,
           languages_at_home: sanitizedData.languagesAtHome.split(',').map(l => l.trim()).filter(Boolean),
+          // New fields for Item #9
+          el_status: sanitizedData.elStatus,
+          speech_language_history: sanitizedData.speechLanguageHistory,
+          vision_hearing_status: sanitizedData.visionHearingStatus,
+          attendance_concerns: sanitizedData.attendanceConcerns,
           primary_concerns: sanitizedData.primaryConcerns,
-          current_supports: sanitizedData.currentSupports,
+          school_supports_status: sanitizedData.schoolSupportsStatus,
+          interventions_tried: sanitizedData.interventionsTried,
           parent_observations: sanitizedData.parentObservations,
+          parent_goal: sanitizedData.parentGoal,
           consent_screening: true,
           consent_store_data: true,
           consent_record_zoom: sanitizedData.consentRecordZoom,

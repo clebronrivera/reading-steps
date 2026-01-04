@@ -14,20 +14,49 @@ const faqs = [
     category: "About the Service",
     questions: [
       {
-        q: "What is a reading screener?",
-        a: "A reading screener is a brief assessment that looks at foundational reading skills to identify potential areas of concern. It's not a diagnostic test, but rather a first step in understanding a child's reading development. Our screeners look at skills like letter knowledge, phonological awareness, decoding, fluency, and comprehension."
+        q: "What is a reading screening?",
+        a: "A reading screening is a brief assessment that looks at foundational reading skills to identify potential areas of concern and risk patterns. It's not a diagnostic test, but rather a first step in understanding a child's reading development. Our screenings look at skills like phonological awareness, phonics/decoding, sight words, fluency, and comprehension indicators."
       },
       {
         q: "Is this a diagnostic evaluation?",
-        a: "No. This is an educational screening service, not a formal diagnostic evaluation. Screenings can identify potential concerns that may warrant further assessment by a licensed professional. If concerns are identified, I'll provide recommendations for seeking formal evaluation through your school district or private providers."
+        a: "No. This is an educational screening service to identify skill patterns and risk. It does not diagnose a disability. Screenings can identify potential concerns that may warrant further assessment by a licensed professional. If concerns are identified, I'll provide clear recommendations for next steps."
       },
       {
         q: "Who conducts the screenings?",
-        a: "I'm a graduate student in School Psychology with specialized training in educational assessment and reading development. I conduct all screenings personally and maintain confidentiality of all information."
+        a: "I'm an Educational Specialist with 16 years of experience spanning from classroom teacher (intellectual disabilities and autism) to administrative dean. My background includes MTSS/RTI systems, special education processes, 504 plans, and educational assessment."
       },
       {
         q: "Why is this service free?",
-        a: "I offer free screenings as part of my graduate training and because I believe all families should have access to early identification services. I also offer paid follow-up services for families who want more in-depth support."
+        a: "Free screening is available because I believe all families should have access to early identification services. I also offer paid upgrades (Comprehensive Literacy Review) for families who want extended assessment, a detailed report, and an interpretation call."
+      },
+      {
+        q: "What is the \"Comprehensive Literacy Review\" upgrade?",
+        a: "The paid upgrade includes: a Part 2 extended assessment session targeted based on screener results, a comprehensive written report with interpretation, intervention plans, accommodation suggestions, school support pathways guidance, and a 30-minute interpretation call with me."
+      }
+    ]
+  },
+  {
+    category: "Virtual Validity & Integrity",
+    questions: [
+      {
+        q: "How do you ensure my child is responding meaningfully?",
+        a: "Our Split-Screen Assessment System keeps the student view completely clean—just the stimulus, no distractions. I observe behavior throughout and capture detailed observations about attention, effort, and engagement. At the end of each session, I rate validity to flag any concerns."
+      },
+      {
+        q: "What if my child is distracted or guessing?",
+        a: "I monitor for signs of inattention, impulsivity, frustration, and avoidance throughout the session. If results may not reflect true skill due to testing conditions, this is documented in the validity notes and affects interpretation. Recommendations are adjusted accordingly."
+      },
+      {
+        q: "Why does a parent need to be present?",
+        a: "Parent presence helps ensure the child feels comfortable and supported. It also provides accountability for testing conditions—quiet space, minimal distractions, and stable technology. You can observe quietly in the background."
+      },
+      {
+        q: "What behaviors do you observe and why?",
+        a: "I rate attention, effort, impulsivity, frustration tolerance, avoidance behaviors, and responsiveness to redirection. These observations help interpret results and identify when performance may not reflect true ability."
+      },
+      {
+        q: "What happens if results may not be valid?",
+        a: "Results are interpreted within testing conditions. If distractions or technology influenced performance, it is noted. The validity status (valid, questionable, or invalid) affects how results are presented and what next steps are recommended."
       }
     ]
   },
@@ -44,11 +73,11 @@ const faqs = [
       },
       {
         q: "Do I need to be present during the session?",
-        a: "Yes, a parent or guardian should be present (or nearby) during the session. You can observe quietly in the background. This helps ensure the child feels comfortable and allows you to see the activities firsthand."
+        a: "Yes, a parent or guardian must be present for the full session. This ensures your child feels comfortable and allows you to observe firsthand. It also helps maintain testing validity."
       },
       {
         q: "What technology do I need?",
-        a: "You'll need a device (computer, tablet, or smartphone) with a camera and microphone, plus a stable internet connection. Sessions are conducted via Zoom."
+        a: "You'll need a device (computer or tablet recommended) with a camera and microphone, plus a stable internet connection. Sessions use our web-based Split-Screen Assessment System."
       },
       {
         q: "Can I reschedule if something comes up?",
@@ -61,7 +90,11 @@ const faqs = [
     questions: [
       {
         q: "What will I receive after the screening?",
-        a: "Within 48 hours of the session, you'll receive a written summary that includes: observations from the session, your child's strengths, areas that may need support, and recommendations for home and school. If appropriate, I'll also include suggestions for follow-up evaluation."
+        a: "Within 48 hours, you'll have access to your Parent Portal with: risk level (low to critical), domain-by-domain results, a downloadable 1-page summary, and a \"what to do next\" checklist. If you upgrade, you'll also receive a comprehensive report and interpretation call."
+      },
+      {
+        q: "What are the risk levels?",
+        a: "Risk levels are: Low (skills appear on track), Moderate (some areas of concern worth monitoring), High (multiple concerns suggesting intervention is needed), and Critical (significant concerns requiring immediate action)."
       },
       {
         q: "Can I share the summary with my child's school?",
@@ -69,11 +102,11 @@ const faqs = [
       },
       {
         q: "What if concerns are identified?",
-        a: "If the screening suggests potential reading difficulties, the summary will include recommendations for next steps. This might include requesting a formal evaluation from your school district, seeking private evaluation, or specific intervention strategies to try at home."
+        a: "If screening suggests potential reading difficulties, the results will include recommendations for next steps. This might include: requesting a formal evaluation from your school district, requesting a 504 plan or intervention plan, seeking private evaluation, or specific intervention strategies for home."
       },
       {
-        q: "Do you offer follow-up services?",
-        a: "Yes, I offer paid follow-up services including more comprehensive screenings, consultation calls, and ongoing progress monitoring. Information about these services will be included in your summary if relevant."
+        q: "What does the \"advocacy guidance\" include?",
+        a: "For high or critical risk levels, you'll receive guidance on: what to request from the school, how to request an evaluation, understanding 504 vs IEP vs intervention plans, and when to consider an educational advocate. We provide sample language you can use in emails to the school."
       }
     ]
   },
@@ -82,19 +115,19 @@ const faqs = [
     questions: [
       {
         q: "How is my information protected?",
-        a: "All information is kept confidential and stored securely. I only collect information necessary for the screening and do not share your information with third parties without your consent."
+        a: "All information is kept confidential and stored securely with access limited to authorized staff. I only collect information necessary for the screening and do not share your information with third parties without your consent."
       },
       {
         q: "Is this service HIPAA compliant?",
-        a: "This is an educational service, not a healthcare service, and is not HIPAA compliant. By using this service, you acknowledge that this is educational support, not healthcare or therapy."
+        a: "This is an educational screening service, not healthcare. HIPAA typically does not apply. We still protect your information and limit access. By using this service, you acknowledge that this is educational support, not healthcare or therapy."
       },
       {
         q: "Can I request my data be deleted?",
         a: "Yes, you can request deletion of your data at any time by contacting me directly. I'll confirm deletion within 7 business days."
       },
       {
-        q: "Why do you ask about recording the Zoom session?",
-        a: "Recording is optional and only done with your explicit consent. If recorded, the video is used solely for my own review and training purposes and is never shared. You can decline recording without affecting the service."
+        q: "Why do you ask about recording the session?",
+        a: "Recording is optional and only done with your explicit consent. If recorded, audio is used solely for scoring verification and quality assurance, and is subject to retention limits. You can decline recording without affecting the service."
       }
     ]
   }
@@ -157,7 +190,7 @@ export default function FAQ() {
           </p>
           <Link to="/intake">
             <Button size="lg" className="hero-gradient border-0 text-primary-foreground hover:opacity-90 gap-2">
-              Start Intake Form
+              Book Free Screener
               <ArrowRight className="h-4 w-4" />
             </Button>
           </Link>

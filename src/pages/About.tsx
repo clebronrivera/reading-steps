@@ -9,7 +9,10 @@ import {
   Heart,
   ArrowRight,
   BookOpen,
-  Users
+  Users,
+  School,
+  ClipboardCheck,
+  Award
 } from "lucide-react";
 
 export default function About() {
@@ -23,14 +26,14 @@ export default function About() {
               About ReadingScreener
             </h1>
             <p className="text-xl text-muted-foreground">
-              A free reading screening service created by a School Psychology graduate student 
-              to help families understand their children's reading development.
+              An educational screening service created by an Educational Specialist 
+              to help families get clear, timely information about their children's reading development.
             </p>
           </div>
         </div>
       </section>
 
-      {/* About Me */}
+      {/* About Me - Educational Specialist Positioning */}
       <section className="py-16 bg-muted/30">
         <div className="container">
           <div className="grid md:grid-cols-2 gap-12 items-center max-w-5xl mx-auto">
@@ -42,39 +45,46 @@ export default function About() {
                 My Background
               </h2>
               <p className="text-muted-foreground mb-4">
-                I'm a graduate student in School Psychology with specialized training in 
-                educational assessment and reading development. My coursework and practicum 
-                experiences have equipped me with knowledge of evidence-based reading 
-                interventions and assessment practices.
+                I'm an <strong>Educational Specialist with 16 years of experience</strong> spanning 
+                from classroom teacher (intellectual disabilities and autism) to administrative dean. 
+                My career has given me deep insight into how schools work—and where they fall short.
               </p>
               <p className="text-muted-foreground mb-4">
-                I created this free screening service to help families who may be concerned 
-                about their child's reading but aren't sure where to start. Early identification 
-                of reading difficulties can make a significant difference in a child's 
-                educational journey.
+                My experience includes enrollment processes, intervention systems (MTSS/RTI), 
+                special education procedures, transition planning, and higher education accommodations. 
+                I understand the full continuum of educational support.
               </p>
               <p className="text-muted-foreground">
-                While I cannot provide formal diagnoses or official evaluations, I can offer 
-                educational screenings that help identify potential areas of concern and 
-                provide recommendations for next steps.
+                I created this screening platform because I've seen firsthand how families struggle 
+                to get timely, clear information about their children's reading development. 
+                Early identification makes all the difference.
               </p>
             </div>
             <div className="grid gap-4">
               <Card className="card-elevated border-0">
                 <CardContent className="pt-6">
-                  <BookOpen className="h-8 w-8 text-primary mb-3" />
-                  <h3 className="font-semibold mb-2">Graduate Training</h3>
+                  <School className="h-8 w-8 text-primary mb-3" />
+                  <h3 className="font-semibold mb-2">16 Years in Education</h3>
                   <p className="text-sm text-muted-foreground">
-                    Specialized coursework in reading development, assessment, and intervention.
+                    From special education teacher to administrative leadership roles.
                   </p>
                 </CardContent>
               </Card>
               <Card className="card-elevated border-0">
                 <CardContent className="pt-6">
-                  <Users className="h-8 w-8 text-primary mb-3" />
-                  <h3 className="font-semibold mb-2">Practicum Experience</h3>
+                  <ClipboardCheck className="h-8 w-8 text-primary mb-3" />
+                  <h3 className="font-semibold mb-2">Systems Expertise</h3>
                   <p className="text-sm text-muted-foreground">
-                    Hands-on experience conducting assessments in school settings.
+                    MTSS/RTI, 504 plans, IEPs, evaluation processes, and school advocacy.
+                  </p>
+                </CardContent>
+              </Card>
+              <Card className="card-elevated border-0">
+                <CardContent className="pt-6">
+                  <Award className="h-8 w-8 text-primary mb-3" />
+                  <h3 className="font-semibold mb-2">Specialized Training</h3>
+                  <p className="text-sm text-muted-foreground">
+                    Graduate training in reading assessment, intervention, and educational diagnostics.
                   </p>
                 </CardContent>
               </Card>
@@ -83,48 +93,52 @@ export default function About() {
         </div>
       </section>
 
-      {/* What I Offer */}
+      {/* Why I Built This */}
       <section className="py-16">
         <div className="container">
           <div className="max-w-3xl mx-auto">
-            <h2 className="text-2xl md:text-3xl font-bold mb-8 text-center">
-              What I Offer
-            </h2>
+            <div className="text-center mb-10">
+              <Heart className="h-12 w-12 text-primary mx-auto mb-4" />
+              <h2 className="text-2xl md:text-3xl font-bold mb-4">
+                Why I Built This Platform
+              </h2>
+            </div>
             <div className="grid gap-6">
               <Card className="card-elevated border-0">
                 <CardContent className="pt-6 flex gap-4">
                   <Target className="h-6 w-6 text-primary flex-shrink-0 mt-1" />
                   <div>
-                    <h3 className="font-semibold mb-2">Educational Reading Screeners</h3>
+                    <h3 className="font-semibold mb-2">Parents Need Clear, Timely Information</h3>
                     <p className="text-muted-foreground">
-                      Brief, standardized screening activities that assess foundational 
-                      reading skills including phonological awareness, letter knowledge, 
-                      decoding, fluency, and comprehension.
+                      Too many families wait months—sometimes years—for answers about their child's 
+                      reading development. Schools have limited resources and long waitlists. 
+                      Parents deserve to know now, not later.
                     </p>
                   </div>
                 </CardContent>
               </Card>
               <Card className="card-elevated border-0">
                 <CardContent className="pt-6 flex gap-4">
-                  <Heart className="h-6 w-6 text-primary flex-shrink-0 mt-1" />
+                  <Users className="h-6 w-6 text-primary flex-shrink-0 mt-1" />
                   <div>
-                    <h3 className="font-semibold mb-2">Supportive Summaries</h3>
+                    <h3 className="font-semibold mb-2">Schools Vary in Communication and Speed</h3>
                     <p className="text-muted-foreground">
-                      After each session, you'll receive a summary that highlights your 
-                      child's strengths, areas that may need support, and practical 
-                      recommendations for home and school.
+                      Some schools are proactive; others require significant parent advocacy. 
+                      This platform gives families independent insight so they can have informed 
+                      conversations with teachers and administrators.
                     </p>
                   </div>
                 </CardContent>
               </Card>
               <Card className="card-elevated border-0">
                 <CardContent className="pt-6 flex gap-4">
-                  <Shield className="h-6 w-6 text-primary flex-shrink-0 mt-1" />
+                  <BookOpen className="h-6 w-6 text-primary flex-shrink-0 mt-1" />
                   <div>
-                    <h3 className="font-semibold mb-2">Privacy-Focused Service</h3>
+                    <h3 className="font-semibold mb-2">Early Screening Reduces Long-Term Harm</h3>
                     <p className="text-muted-foreground">
-                      Your family's information is kept confidential. I take data security 
-                      seriously and only collect information necessary for the screening.
+                      Reading difficulties that go unidentified lead to widening skill gaps, 
+                      frustration, and academic consequences. Early screening opens the door 
+                      to early intervention—when it matters most.
                     </p>
                   </div>
                 </CardContent>
@@ -134,7 +148,7 @@ export default function About() {
         </div>
       </section>
 
-      {/* Important Notes */}
+      {/* Important Notes - Screening vs Diagnosis */}
       <section className="py-16 bg-secondary/30">
         <div className="container">
           <div className="max-w-3xl mx-auto">
@@ -144,13 +158,17 @@ export default function About() {
             <Card className="border-2 border-primary/20">
               <CardContent className="pt-6">
                 <h3 className="font-semibold mb-4">Screening vs. Diagnosis</h3>
+                <div className="p-4 mb-4 rounded-lg bg-primary/5 border border-primary/10">
+                  <p className="text-primary font-medium text-center">
+                    "This is a screening service to identify skill patterns and risk. It does not diagnose a disability."
+                  </p>
+                </div>
                 <ul className="space-y-3 text-muted-foreground">
                   <li className="flex gap-3">
                     <span className="text-primary font-semibold">•</span>
                     <span>
-                      <strong>This is a screening service</strong>, not a formal diagnostic 
-                      evaluation. Screenings help identify potential concerns that may 
-                      warrant further assessment.
+                      <strong>Screenings identify patterns and concerns</strong> that may 
+                      warrant further assessment by licensed professionals.
                     </span>
                   </li>
                   <li className="flex gap-3">
@@ -164,15 +182,15 @@ export default function About() {
                   <li className="flex gap-3">
                     <span className="text-primary font-semibold">•</span>
                     <span>
-                      If concerns are identified, I'll provide recommendations for seeking 
+                      If concerns are identified, I'll provide clear recommendations for seeking 
                       formal evaluation through your school or private providers.
                     </span>
                   </li>
                   <li className="flex gap-3">
                     <span className="text-primary font-semibold">•</span>
                     <span>
-                      This service is <strong>not HIPAA compliant</strong> and should be 
-                      considered educational support, not healthcare.
+                      This is an <strong>educational screening service, not healthcare</strong>. 
+                      HIPAA typically does not apply. We still protect your information and limit access.
                     </span>
                   </li>
                 </ul>
@@ -189,12 +207,12 @@ export default function About() {
             Ready to Get Started?
           </h2>
           <p className="text-muted-foreground mb-8 max-w-xl mx-auto">
-            Complete our intake form to schedule your free reading screener. 
+            Complete our intake form to book your free reading screener. 
             It only takes a few minutes.
           </p>
           <Link to="/intake">
             <Button size="lg" className="hero-gradient border-0 text-primary-foreground hover:opacity-90 gap-2">
-              Start Intake Form
+              Book Free Screener
               <ArrowRight className="h-4 w-4" />
             </Button>
           </Link>
