@@ -63,7 +63,7 @@ export default function Login() {
         });
         if (error) throw error;
 
-        // Check if user has assessor role
+        // Check if user has assessor or admin role
         const { data: roleData, error: roleError } = await supabase
           .from("user_roles")
           .select("role")
@@ -71,11 +71,14 @@ export default function Login() {
           .single();
 
         if (roleError || !roleData) {
-          // No role found - create assessor role for first user
-          await supabase.from("user_roles").insert({
-            user_id: authData.user.id,
-            role: "assessor",
+          // No role found - user is not authorized
+          await supabase.auth.signOut();
+          toast({
+            title: "Access Denied",
+            description: "Your account is not authorized. Please contact an administrator to request access.",
+            variant: "destructive",
           });
+          return;
         }
 
         toast({

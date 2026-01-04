@@ -82,6 +82,7 @@ export default function Intake() {
   const [step, setStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [studentId, setStudentId] = useState<string | null>(null);
+  const [honeypot, setHoneypot] = useState(""); // Hidden bot trap field
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -108,49 +109,42 @@ export default function Intake() {
   const onSubmit = async (data: IntakeFormData) => {
     setIsSubmitting(true);
     try {
-      // Create parent
-      const { data: parentData, error: parentError } = await supabase
-        .from("parents")
-        .insert({
-          full_name: data.parentName,
-          email: data.parentEmail,
-          phone: data.parentPhone,
-        })
-        .select()
-        .single();
+      // Call secure edge function with rate limiting
+      const { data: response, error } = await supabase.functions.invoke('public-intake', {
+        body: {
+          type: 'intake',
+          parentName: data.parentName,
+          parentEmail: data.parentEmail,
+          parentPhone: data.parentPhone,
+          studentName: data.studentName,
+          studentDob: data.studentDob,
+          studentGrade: data.studentGrade,
+          studentSchool: data.studentSchool || undefined,
+          languagesAtHome: data.languagesAtHome,
+          primaryConcerns: data.primaryConcerns,
+          currentSupports: data.currentSupports,
+          parentObservations: data.parentObservations,
+          consentScreening: data.consentScreening,
+          consentStoreData: data.consentStoreData,
+          consentRecordZoom: data.consentRecordZoom,
+          honeypot: honeypot, // Bot trap
+        }
+      });
 
-      if (parentError) throw parentError;
+      if (error) throw error;
+      
+      if (!response?.success) {
+        throw new Error(response?.error || 'Failed to submit intake form');
+      }
 
-      // Create student
-      const { data: studentData, error: studentError } = await supabase
-        .from("students")
-        .insert({
-          parent_id: parentData.id,
-          full_name: data.studentName,
-          date_of_birth: data.studentDob,
-          grade: data.studentGrade,
-          school: data.studentSchool || null,
-          languages_at_home: data.languagesAtHome.split(",").map(l => l.trim()),
-          primary_concerns: data.primaryConcerns,
-          current_supports: data.currentSupports,
-          parent_observations: data.parentObservations,
-          consent_screening: data.consentScreening,
-          consent_store_data: data.consentStoreData,
-          consent_record_zoom: data.consentRecordZoom || false,
-        })
-        .select()
-        .single();
-
-      if (studentError) throw studentError;
-
-      setStudentId(studentData.id);
+      setStudentId(response.studentId);
       toast({
         title: "Intake form submitted!",
         description: "Now let's schedule your screening session.",
       });
       
       // Navigate to scheduling with student ID
-      navigate(`/schedule?studentId=${studentData.id}`);
+      navigate(`/schedule?studentId=${response.studentId}`);
     } catch (error: any) {
       toast({
         title: "Error submitting form",
@@ -232,6 +226,20 @@ export default function Intake() {
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-6">
+                  {/* Honeypot field - hidden from users, visible to bots */}
+                  <div style={{ position: 'absolute', left: '-9999px', opacity: 0 }} aria-hidden="true">
+                    <label htmlFor="website">Website</label>
+                    <input 
+                      type="text" 
+                      id="website" 
+                      name="website" 
+                      value={honeypot}
+                      onChange={(e) => setHoneypot(e.target.value)}
+                      tabIndex={-1}
+                      autoComplete="off"
+                    />
+                  </div>
+                  
                   {/* Step 1: Parent Info */}
                   {step === 1 && (
                     <>
