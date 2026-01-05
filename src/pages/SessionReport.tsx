@@ -3,6 +3,7 @@ import { useParams, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { AIReportGenerator } from "@/components/reports/AIReportGenerator";
+import { SkillsSummaryGrid } from "@/components/reports/SkillsSummaryGrid";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -255,6 +256,9 @@ export default function SessionReport() {
             </div>
           </CardContent>
         </Card>
+
+        {/* Skills Summary Grid */}
+        <SkillsSummaryGrid sessionId={sessionId!} />
 
         {/* AI Report Generator */}
         <AIReportGenerator
