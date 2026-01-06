@@ -61,6 +61,33 @@ export type Database = {
           },
         ]
       }
+      assessment_categories: {
+        Row: {
+          created_at: string
+          description: string | null
+          display_order: number
+          id: string
+          name: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          display_order?: number
+          id?: string
+          name: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          display_order?: number
+          id?: string
+          name?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       assessments: {
         Row: {
           created_at: string
@@ -324,6 +351,7 @@ export type Database = {
       }
       parent_scales: {
         Row: {
+          category_id: string | null
           completed_at: string | null
           created_at: string
           id: string
@@ -333,6 +361,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          category_id?: string | null
           completed_at?: string | null
           created_at?: string
           id?: string
@@ -342,6 +371,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          category_id?: string | null
           completed_at?: string | null
           created_at?: string
           id?: string
@@ -351,6 +381,13 @@ export type Database = {
           updated_at?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "parent_scales_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "assessment_categories"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "parent_scales_student_id_fkey"
             columns: ["student_id"]
@@ -725,6 +762,7 @@ export type Database = {
       subtests: {
         Row: {
           assessment_id: string
+          category_id: string | null
           created_at: string
           description: string | null
           discontinue_rule: Json | null
@@ -743,6 +781,7 @@ export type Database = {
         }
         Insert: {
           assessment_id: string
+          category_id?: string | null
           created_at?: string
           description?: string | null
           discontinue_rule?: Json | null
@@ -761,6 +800,7 @@ export type Database = {
         }
         Update: {
           assessment_id?: string
+          category_id?: string | null
           created_at?: string
           description?: string | null
           discontinue_rule?: Json | null
@@ -783,6 +823,13 @@ export type Database = {
             columns: ["assessment_id"]
             isOneToOne: false
             referencedRelation: "assessments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "subtests_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "assessment_categories"
             referencedColumns: ["id"]
           },
         ]
