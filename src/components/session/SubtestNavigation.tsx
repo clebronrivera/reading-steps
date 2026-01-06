@@ -1,4 +1,4 @@
-import { ChevronLeft, ChevronRight, List, AlertCircle } from 'lucide-react';
+import { ChevronLeft, ChevronRight, List, AlertCircle, Save, CheckCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   Sheet,
@@ -7,6 +7,17 @@ import {
   SheetTitle,
   SheetTrigger,
 } from '@/components/ui/sheet';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
 import type { Database } from '@/integrations/supabase/types';
 
 type Subtest = Database['public']['Tables']['subtests']['Row'];
@@ -16,9 +27,12 @@ interface SubtestNavigationProps {
   currentSubtest: Subtest | null;
   currentItemIndex: number;
   totalItems: number;
+  responsesCount?: number;
   onNavigateSubtest: (subtestId: string) => void;
   onNavigateItem: (index: number) => void;
   onDiscontinue: () => void;
+  onSubmitSubtest?: () => Promise<void>;
+  isSubmitting?: boolean;
 }
 
 export function SubtestNavigation({
@@ -26,9 +40,12 @@ export function SubtestNavigation({
   currentSubtest,
   currentItemIndex,
   totalItems,
+  responsesCount = 0,
   onNavigateSubtest,
   onNavigateItem,
   onDiscontinue,
+  onSubmitSubtest,
+  isSubmitting = false,
 }: SubtestNavigationProps) {
   const currentIndex = subtests.findIndex(s => s.id === currentSubtest?.id);
   const hasPrevSubtest = currentIndex > 0;
@@ -47,6 +64,14 @@ export function SubtestNavigation({
           Item {currentItemIndex + 1} / {totalItems || '?'}
         </span>
       </div>
+
+      {/* Responses progress */}
+      {totalItems > 0 && (
+        <div className="flex items-center gap-2 text-xs text-muted-foreground">
+          <CheckCircle className="h-3 w-3" />
+          <span>{responsesCount} of {totalItems} items scored</span>
+        </div>
+      )}
 
       {/* Item navigation */}
       <div className="flex items-center gap-2">
@@ -71,6 +96,45 @@ export function SubtestNavigation({
           <ChevronRight className="h-4 w-4 ml-1" />
         </Button>
       </div>
+
+      {/* Submit Subtest Button */}
+      {onSubmitSubtest && (
+        <AlertDialog>
+          <AlertDialogTrigger asChild>
+            <Button 
+              variant="default" 
+              size="sm" 
+              className="w-full bg-success hover:bg-success/90 text-success-foreground"
+              disabled={isSubmitting || responsesCount === 0}
+            >
+              <Save className="h-4 w-4 mr-2" />
+              {isSubmitting ? 'Saving...' : 'Submit & Continue'}
+            </Button>
+          </AlertDialogTrigger>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Submit Subtest Results</AlertDialogTitle>
+              <AlertDialogDescription>
+                You've scored {responsesCount} of {totalItems} items for "{currentSubtest?.name}".
+                {responsesCount < totalItems && (
+                  <span className="block mt-2 text-warning">
+                    Warning: Not all items have been scored.
+                  </span>
+                )}
+                <span className="block mt-2">
+                  Results will be saved to the student's record and you'll move to the next subtest.
+                </span>
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <AlertDialogAction onClick={onSubmitSubtest}>
+                Submit Results
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+      )}
 
       {/* Subtest navigation */}
       <div className="flex items-center gap-2">

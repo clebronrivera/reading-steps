@@ -23,6 +23,7 @@ import {
 } from "lucide-react";
 import { AssignScalesDialog } from "@/components/dashboard/AssignScalesDialog";
 import { GeneratePortalLinkDialog } from "@/components/dashboard/GeneratePortalLinkDialog";
+import { AssessmentResultsCard } from "@/components/dashboard/AssessmentResultsCard";
 
 type LeadStatus = "new" | "scheduled" | "completed" | "follow_up_needed" | "converted";
 type RiskLevel = "low" | "moderate" | "high" | "critical";
@@ -317,6 +318,9 @@ export default function StudentDetail() {
               )}
             </CardContent>
           </Card>
+
+          {/* Assessment Results */}
+          <AssessmentResultsCard studentId={student.id} />
         </div>
 
         {/* Sidebar */}
