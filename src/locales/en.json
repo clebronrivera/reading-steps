@@ -1,4 +1,379 @@
 {
+  "nav": {
+    "home": "Home",
+    "howItWorks": "How It Works",
+    "faq": "FAQ",
+    "about": "About",
+    "bookFreeScreener": "Book Free Screener",
+    "staffLogin": "Staff Login"
+  },
+  "footer": {
+    "description": "Free virtual reading screenings to identify skill patterns and risk early. Supporting parents and educators in understanding children's reading development.",
+    "quickLinks": "Quick Links",
+    "legal": "Legal",
+    "privacy": "Privacy Policy",
+    "terms": "Terms of Service",
+    "disclaimer": "Screening Disclaimer",
+    "copyright": "© {year} ReadingScreener. Educational screening support service.",
+    "note": "This is a screening service to identify skill patterns and risk. It does not diagnose a disability."
+  },
+  "home": {
+    "badge": "Free Virtual Reading Screening",
+    "heroTitle": "Is Your Child Struggling",
+    "heroTitleHighlight": "to Read?",
+    "heroSubtitle": "Get a free, 30-minute virtual reading screening with an Educational Specialist. Identify risk patterns early and get clear next steps.",
+    "learnHow": "Learn How It Works",
+    "screeningBoundary": "This is a screening service to identify skill patterns and risk. It does not diagnose a disability.",
+    "concernsTitle": "Common Reading Concerns We Screen For",
+    "concernsSubtitle": "Not sure if your child needs support? Here are some signs parents notice:",
+    "concerns": {
+      "letterRecognition": "Letter recognition",
+      "letterSounds": "Letter sounds",
+      "soundingOut": "Sounding out words",
+      "fluency": "Reading fluency",
+      "comprehension": "Reading comprehension",
+      "spelling": "Spelling difficulties"
+    },
+    "featuresTitle": "Why Choose Our Free Screening?",
+    "featuresSubtitle": "Our Split-Screen Assessment System delivers accurate, distraction-free screening sessions from the comfort of your home.",
+    "features": {
+      "splitScreen": {
+        "title": "Split-Screen Sessions",
+        "description": "Clean stimulus display for students, full control panel for assessor."
+      },
+      "duration": {
+        "title": "30-Minute Sessions",
+        "description": "Quick, focused sessions designed to be engaging for your child."
+      },
+      "portal": {
+        "title": "Parent Portal Access",
+        "description": "View results, download summaries, and get clear next steps."
+      },
+      "secure": {
+        "title": "Confidential & Secure",
+        "description": "Your child's information is kept private and secure."
+      }
+    },
+    "stepsTitle": "How It Works",
+    "stepsSubtitle": "Simple steps to get started with your free reading screening.",
+    "steps": {
+      "intake": {
+        "title": "Free Intake",
+        "description": "Tell us about your child and your concerns."
+      },
+      "book": {
+        "title": "Book Free Screener",
+        "description": "Pick a convenient time for a 30-minute session."
+      },
+      "session": {
+        "title": "Live Screening Session",
+        "description": "Your child participates in engaging reading activities."
+      },
+      "results": {
+        "title": "Results + Next Steps",
+        "description": "Access your Parent Portal with clear action items."
+      }
+    },
+    "startIntake": "Start Your Intake Form",
+    "trustTitle": "Supporting Families, One Screening at a Time",
+    "trustText": "As an Educational Specialist with 16 years of experience, I'm dedicated to helping families get clear, timely information about their children's reading development. This free screening service provides early insights and connects you with resources to support your child's literacy journey.",
+    "trustNote": "Please note: This is an educational screening service, not a diagnostic assessment. See our",
+    "trustNoteLink": "screening disclaimer",
+    "trustNoteEnd": "for more information.",
+    "ctaTitle": "Ready to Learn More About Your Child's Reading?",
+    "ctaSubtitle": "Book your free 30-minute virtual reading screening today. No cost, no obligation—just helpful insights and clear next steps."
+  },
+  "howItWorks": {
+    "title": "How It Works",
+    "subtitle": "Our simple 4-step process takes you from intake to actionable next steps. Free screening included—upgrade available for comprehensive support.",
+    "steps": {
+      "intake": {
+        "title": "Step 1: Free Intake",
+        "duration": "5-10 minutes",
+        "description": "Complete our intake form with information about your child, your concerns, and any current school supports.",
+        "details": [
+          "Parent/guardian contact information",
+          "Student information (name, grade, school)",
+          "Current school supports (MTSS, 504, IEP if applicable)",
+          "Specific reading concerns you've noticed",
+          "Your goals for this screening",
+          "Consent for screening"
+        ]
+      },
+      "book": {
+        "title": "Step 2: Book Free Screener",
+        "duration": "2 minutes",
+        "description": "Choose a convenient time for your 30-minute Split-Screen Assessment Session.",
+        "details": [
+          "Choose from available time slots",
+          "Sessions available evenings and weekends",
+          "Sessions are 30 minutes",
+          "Receive confirmation with session link"
+        ]
+      },
+      "session": {
+        "title": "Step 3: Live Split-Screen Screening Session",
+        "duration": "30 minutes",
+        "description": "Your child participates in engaging reading activities through our Split-Screen Assessment System. You'll observe while I administer standardized screening tasks.",
+        "details": [
+          "Student sees clean stimulus screen (distraction-free)",
+          "Activities assess phonological awareness, decoding, fluency, and more",
+          "Parent present and can observe",
+          "Real-time scoring and observations captured"
+        ]
+      },
+      "results": {
+        "title": "Step 4: Results in Parent Portal + Next Steps",
+        "duration": "Within 48 hours",
+        "description": "Access your results through the Parent Portal. See your child's risk level, strengths, and a \"what to do next\" checklist.",
+        "details": [
+          "Risk level (low, moderate, high, critical)",
+          "Domain-by-domain results",
+          "Downloadable 1-page summary (free)",
+          "\"What to do next\" checklist",
+          "Upgrade option for comprehensive review"
+        ]
+      }
+    },
+    "comparisonTitle": "Free Screening vs. Comprehensive Review",
+    "freeScreening": {
+      "title": "Free Screening",
+      "subtitle": "No cost, no obligation",
+      "includes": [
+        "Complete intake and background gathering",
+        "30-minute live screening session",
+        "Results summary with risk level",
+        "Parent Portal access",
+        "Downloadable 1-page summary",
+        "\"What to do next\" checklist"
+      ]
+    },
+    "paidUpgrade": {
+      "title": "Comprehensive Literacy Review",
+      "subtitle": "For families who want the full picture",
+      "includes": [
+        "Part 2 extended assessment session (targeted based on screener results)",
+        "Comprehensive written report with:",
+        "— Background summary from intake",
+        "— Results by literacy domain",
+        "— Interpretation (what it suggests, what it does not prove)",
+        "— Intervention plan for home and school",
+        "— Three accommodation suggestions",
+        "— School support pathways guidance (504, IEP, evaluation request)",
+        "— Progress monitoring plan",
+        "30-minute interpretation call with Educational Specialist"
+      ]
+    },
+    "expectationsTitle": "What to Expect",
+    "expectations": {
+      "ready": {
+        "title": "What to Have Ready",
+        "items": [
+          "A quiet space with minimal distractions",
+          "Computer or tablet with camera and microphone",
+          "Stable internet connection",
+          "Parent present for the full session"
+        ]
+      },
+      "during": {
+        "title": "During the Session",
+        "items": [
+          "I'll introduce the activities and put your child at ease",
+          "Your child sees only the stimulus—clean and focused",
+          "I control pacing and capture responses in real-time",
+          "Sessions are encouraging and designed to minimize frustration"
+        ]
+      },
+      "after": {
+        "title": "After the Session",
+        "items": [
+          "Results available in Parent Portal within 48 hours",
+          "Clear next steps based on risk level",
+          "Option to upgrade for comprehensive report",
+          "Guidance on how to talk to your child's school"
+        ]
+      }
+    },
+    "ctaTitle": "Ready to Get Started?",
+    "ctaSubtitle": "The intake form takes just 5-10 minutes. Start your child's reading screening journey today."
+  },
+  "faq": {
+    "title": "Frequently Asked Questions",
+    "subtitle": "Have questions about our free reading screening service? Find answers to common questions below.",
+    "categories": {
+      "about": {
+        "title": "About the Service",
+        "questions": [
+          {
+            "q": "What is a reading screening?",
+            "a": "A reading screening is a brief assessment that looks at foundational reading skills to identify potential areas of concern and risk patterns. It's not a diagnostic test, but rather a first step in understanding a child's reading development. Our screenings look at skills like phonological awareness, phonics/decoding, sight words, fluency, and comprehension indicators."
+          },
+          {
+            "q": "Is this a diagnostic evaluation?",
+            "a": "No. This is an educational screening service to identify skill patterns and risk. It does not diagnose a disability. Screenings can identify potential concerns that may warrant further assessment by a licensed professional. If concerns are identified, I'll provide clear recommendations for next steps."
+          },
+          {
+            "q": "Who conducts the screenings?",
+            "a": "I'm an Educational Specialist with 16 years of experience spanning from classroom teacher (intellectual disabilities and autism) to administrative dean. My background includes MTSS/RTI systems, special education processes, 504 plans, and educational assessment."
+          },
+          {
+            "q": "Why is this service free?",
+            "a": "Free screening is available because I believe all families should have access to early identification services. I also offer paid upgrades (Comprehensive Literacy Review) for families who want extended assessment, a detailed report, and an interpretation call."
+          },
+          {
+            "q": "What is the \"Comprehensive Literacy Review\" upgrade?",
+            "a": "The paid upgrade includes: a Part 2 extended assessment session targeted based on screener results, a comprehensive written report with interpretation, intervention plans, accommodation suggestions, school support pathways guidance, and a 30-minute interpretation call with me."
+          }
+        ]
+      },
+      "validity": {
+        "title": "Virtual Validity & Integrity",
+        "questions": [
+          {
+            "q": "How do you ensure my child is responding meaningfully?",
+            "a": "Our Split-Screen Assessment System keeps the student view completely clean—just the stimulus, no distractions. I observe behavior throughout and capture detailed observations about attention, effort, and engagement. At the end of each session, I rate validity to flag any concerns."
+          },
+          {
+            "q": "What if my child is distracted or guessing?",
+            "a": "I monitor for signs of inattention, impulsivity, frustration, and avoidance throughout the session. If results may not reflect true skill due to testing conditions, this is documented in the validity notes and affects interpretation. Recommendations are adjusted accordingly."
+          },
+          {
+            "q": "Why does a parent need to be present?",
+            "a": "Parent presence helps ensure the child feels comfortable and supported. It also provides accountability for testing conditions—quiet space, minimal distractions, and stable technology. You can observe quietly in the background."
+          },
+          {
+            "q": "What behaviors do you observe and why?",
+            "a": "I rate attention, effort, impulsivity, frustration tolerance, avoidance behaviors, and responsiveness to redirection. These observations help interpret results and identify when performance may not reflect true ability."
+          },
+          {
+            "q": "What happens if results may not be valid?",
+            "a": "Results are interpreted within testing conditions. If distractions or technology influenced performance, it is noted. The validity status (valid, questionable, or invalid) affects how results are presented and what next steps are recommended."
+          }
+        ]
+      },
+      "scheduling": {
+        "title": "Scheduling & Sessions",
+        "questions": [
+          {
+            "q": "How long are the screening sessions?",
+            "a": "Each session is approximately 30 minutes. This includes time for introduction, the actual screening activities, and wrapping up."
+          },
+          {
+            "q": "What ages/grades do you serve?",
+            "a": "I work with students in grades K-12. The specific screening activities are adapted based on the child's age and grade level."
+          },
+          {
+            "q": "Do I need to be present during the session?",
+            "a": "Yes, a parent or guardian must be present for the full session. This ensures your child feels comfortable and allows you to observe firsthand. It also helps maintain testing validity."
+          },
+          {
+            "q": "What technology do I need?",
+            "a": "You'll need a device (computer or tablet recommended) with a camera and microphone, plus a stable internet connection. Sessions use our web-based Split-Screen Assessment System."
+          },
+          {
+            "q": "Can I reschedule if something comes up?",
+            "a": "Yes! Please contact me as soon as possible if you need to reschedule. I ask for at least 24 hours notice when possible."
+          }
+        ]
+      },
+      "afterScreening": {
+        "title": "After the Screening",
+        "questions": [
+          {
+            "q": "What will I receive after the screening?",
+            "a": "Within 48 hours, you'll have access to your Parent Portal with: risk level (low to critical), domain-by-domain results, a downloadable 1-page summary, and a \"what to do next\" checklist. If you upgrade, you'll also receive a comprehensive report and interpretation call."
+          },
+          {
+            "q": "What are the risk levels?",
+            "a": "Risk levels are: Low (skills appear on track), Moderate (some areas of concern worth monitoring), High (multiple concerns suggesting intervention is needed), and Critical (significant concerns requiring immediate action)."
+          },
+          {
+            "q": "Can I share the summary with my child's school?",
+            "a": "Absolutely! The summary is designed to be helpful for conversations with teachers and school staff. You can share it with anyone you choose."
+          },
+          {
+            "q": "What if concerns are identified?",
+            "a": "If screening suggests potential reading difficulties, the results will include recommendations for next steps. This might include: requesting a formal evaluation from your school district, requesting a 504 plan or intervention plan, seeking private evaluation, or specific intervention strategies for home."
+          },
+          {
+            "q": "What does the \"advocacy guidance\" include?",
+            "a": "For high or critical risk levels, you'll receive guidance on: what to request from the school, how to request an evaluation, understanding 504 vs IEP vs intervention plans, and when to consider an educational advocate. We provide sample language you can use in emails to the school."
+          }
+        ]
+      },
+      "privacy": {
+        "title": "Privacy & Data",
+        "questions": [
+          {
+            "q": "How is my information protected?",
+            "a": "All information is kept confidential and stored securely with access limited to authorized staff. I only collect information necessary for the screening and do not share your information with third parties without your consent."
+          },
+          {
+            "q": "Is this service HIPAA compliant?",
+            "a": "This is an educational screening service, not healthcare. HIPAA typically does not apply. We still protect your information and limit access. By using this service, you acknowledge that this is educational support, not healthcare or therapy."
+          },
+          {
+            "q": "Can I request my data be deleted?",
+            "a": "Yes, you can request deletion of your data at any time by contacting me directly. I'll confirm deletion within 7 business days."
+          },
+          {
+            "q": "Why do you ask about recording the session?",
+            "a": "Recording is optional and only done with your explicit consent. If recorded, audio is used solely for scoring verification and quality assurance, and is subject to retention limits. You can decline recording without affecting the service."
+          }
+        ]
+      }
+    },
+    "ctaTitle": "Still Have Questions?",
+    "ctaSubtitle": "Can't find the answer you're looking for? Start the intake form and feel free to share any questions or concerns."
+  },
+  "about": {
+    "title": "About ReadingScreener",
+    "subtitle": "An educational screening service created by an Educational Specialist to help families get clear, timely information about their children's reading development.",
+    "backgroundTitle": "My Background",
+    "backgroundText1": "I'm an Educational Specialist with 16 years of experience spanning from classroom teacher (intellectual disabilities and autism) to administrative dean. My career has given me deep insight into how schools work—and where they fall short.",
+    "backgroundText2": "My experience includes enrollment processes, intervention systems (MTSS/RTI), special education procedures, transition planning, and higher education accommodations. I understand the full continuum of educational support.",
+    "backgroundText3": "I created this screening platform because I've seen firsthand how families struggle to get timely, clear information about their children's reading development. Early identification makes all the difference.",
+    "credentials": {
+      "experience": {
+        "title": "16 Years in Education",
+        "description": "From special education teacher to administrative leadership roles."
+      },
+      "systems": {
+        "title": "Systems Expertise",
+        "description": "MTSS/RTI, 504 plans, IEPs, evaluation processes, and school advocacy."
+      },
+      "training": {
+        "title": "Specialized Training",
+        "description": "Graduate training in reading assessment, intervention, and educational diagnostics."
+      }
+    },
+    "whyTitle": "Why I Built This Platform",
+    "reasons": {
+      "timely": {
+        "title": "Parents Need Clear, Timely Information",
+        "description": "Too many families wait months—sometimes years—for answers about their child's reading development. Schools have limited resources and long waitlists. Parents deserve to know now, not later."
+      },
+      "schools": {
+        "title": "Schools Vary in Communication and Speed",
+        "description": "Some schools are proactive; others require significant parent advocacy. This platform gives families independent insight so they can have informed conversations with teachers and administrators."
+      },
+      "early": {
+        "title": "Early Screening Reduces Long-Term Harm",
+        "description": "Reading difficulties that go unidentified lead to widening skill gaps, frustration, and academic consequences. Early screening opens the door to early intervention—when it matters most."
+      }
+    },
+    "importantTitle": "Important Information",
+    "screeningVsDiagnosis": "Screening vs. Diagnosis",
+    "boundaryStatement": "This is a screening service to identify skill patterns and risk. It does not diagnose a disability.",
+    "importantPoints": [
+      "Screenings identify patterns and concerns that may warrant further assessment by licensed professionals.",
+      "I cannot diagnose learning disabilities, dyslexia, or other conditions. Only qualified professionals (licensed psychologists, certified educational diagnosticians) can provide formal diagnoses.",
+      "If concerns are identified, I'll provide clear recommendations for seeking formal evaluation through your school or private providers.",
+      "This is an educational screening service, not healthcare. HIPAA typically does not apply. We still protect your information and limit access."
+    ],
+    "ctaTitle": "Ready to Get Started?",
+    "ctaSubtitle": "Complete our intake form to book your free reading screener. It only takes a few minutes."
+  },
   "intake": {
     "title": "Intake Form",
     "subtitle": "Complete this form to book your free reading screening session.",
