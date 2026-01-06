@@ -6,8 +6,9 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ClipboardList, CheckCircle, Clock } from "lucide-react";
+import { ClipboardList, CheckCircle, Clock, Brain } from "lucide-react";
 import { toast } from "sonner";
+import { SEBScreenerFull, SEBScreenerBrief, SEBOverallResult, RiskLevel } from "./seb-screener";
 
 interface ParentScale {
   id: string;
@@ -20,7 +21,19 @@ interface ParentScalesFormProps {
   onSubmit: (scaleType: string, responses: Record<string, unknown>) => Promise<void>;
 }
 
-const scales = {
+type ScaleType = 'reading_history' | 'home_literacy' | 'behavior_checklist' | 'developmental_milestones' | 'seb_brief' | 'seb_full';
+
+const scales: Record<string, {
+  title: string;
+  description: string;
+  questions?: Array<{
+    id: string;
+    question: string;
+    type: 'choice' | 'text';
+    options?: string[];
+  }>;
+  component?: 'seb_brief' | 'seb_full';
+}> = {
   reading_history: {
     title: "Family Reading History",
     description: "Help us understand reading patterns in your family",
@@ -146,12 +159,23 @@ const scales = {
       },
     ],
   },
+  seb_brief: {
+    title: "Brief SEB Check-In",
+    description: "Quick social, emotional, and behavioral check-in (6 questions)",
+    component: "seb_brief",
+  },
+  seb_full: {
+    title: "SEB Screener",
+    description: "Comprehensive social, emotional, and behavioral screener (53 questions)",
+    component: "seb_full",
+  },
 };
 
 export function ParentScalesForm({ completedScales, onSubmit }: ParentScalesFormProps) {
   const [activeScale, setActiveScale] = useState<string>("reading_history");
   const [responses, setResponses] = useState<Record<string, Record<string, string>>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showSEBFull, setShowSEBFull] = useState(false);
 
   const isScaleCompleted = (scaleType: string) =>
     completedScales.some((s) => s.scale_type === scaleType);
@@ -168,14 +192,16 @@ export function ParentScalesForm({ completedScales, onSubmit }: ParentScalesForm
 
   const handleSubmit = async (scaleType: string) => {
     const scaleResponses = responses[scaleType];
-    const scale = scales[scaleType as keyof typeof scales];
+    const scale = scales[scaleType];
 
-    const requiredQuestions = scale.questions.filter((q) => q.type === "choice");
-    const answeredQuestions = Object.keys(scaleResponses || {});
+    if (scale.questions) {
+      const requiredQuestions = scale.questions.filter((q) => q.type === "choice");
+      const answeredQuestions = Object.keys(scaleResponses || {});
 
-    if (requiredQuestions.some((q) => !answeredQuestions.includes(q.id))) {
-      toast.error("Please answer all required questions");
-      return;
+      if (requiredQuestions.some((q) => !answeredQuestions.includes(q.id))) {
+        toast.error("Please answer all required questions");
+        return;
+      }
     }
 
     setIsSubmitting(true);
@@ -188,6 +214,41 @@ export function ParentScalesForm({ completedScales, onSubmit }: ParentScalesForm
       setIsSubmitting(false);
     }
   };
+
+  const handleSEBBriefComplete = async (
+    sebResponses: Record<string, number>,
+    results: { categoryScores: Record<string, { score: number; risk: RiskLevel }>; overallRisk: RiskLevel; requiresFollowUp: string[] }
+  ) => {
+    setIsSubmitting(true);
+    try {
+      await onSubmit("seb_brief", { responses: sebResponses, results });
+      toast.success("Brief SEB Check-In submitted successfully");
+    } catch {
+      toast.error("Failed to submit");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleSEBFullComplete = async (
+    sebResponses: Record<string, number>,
+    results: SEBOverallResult
+  ) => {
+    setIsSubmitting(true);
+    try {
+      await onSubmit("seb_full", { responses: sebResponses, results });
+      toast.success("SEB Screener submitted successfully");
+      setShowSEBFull(false);
+    } catch {
+      toast.error("Failed to submit");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  // Separate standard scales from SEB scales for better UI organization
+  const standardScales = Object.entries(scales).filter(([key]) => !key.startsWith('seb_'));
+  const sebScales = Object.entries(scales).filter(([key]) => key.startsWith('seb_'));
 
   return (
     <Card className="card-elevated">
@@ -202,8 +263,8 @@ export function ParentScalesForm({ completedScales, onSubmit }: ParentScalesForm
       </CardHeader>
       <CardContent>
         <Tabs value={activeScale} onValueChange={setActiveScale}>
-          <TabsList className="grid grid-cols-2 lg:grid-cols-4 mb-6">
-            {Object.entries(scales).map(([key, scale]) => (
+          <TabsList className="grid grid-cols-2 lg:grid-cols-6 mb-6">
+            {standardScales.map(([key, scale]) => (
               <TabsTrigger key={key} value={key} className="relative">
                 <span className="truncate">{scale.title.split(" ")[0]}</span>
                 {isScaleCompleted(key) && (
@@ -211,9 +272,19 @@ export function ParentScalesForm({ completedScales, onSubmit }: ParentScalesForm
                 )}
               </TabsTrigger>
             ))}
+            {sebScales.map(([key, scale]) => (
+              <TabsTrigger key={key} value={key} className="relative">
+                <Brain className="h-3 w-3 mr-1" />
+                <span className="truncate">{key === 'seb_brief' ? 'Brief SEB' : 'Full SEB'}</span>
+                {isScaleCompleted(key) && (
+                  <CheckCircle className="h-3 w-3 text-success absolute -top-1 -right-1" />
+                )}
+              </TabsTrigger>
+            ))}
           </TabsList>
 
-          {Object.entries(scales).map(([key, scale]) => (
+          {/* Standard questionnaires */}
+          {standardScales.map(([key, scale]) => (
             <TabsContent key={key} value={key} className="space-y-6">
               <div className="flex items-center justify-between">
                 <div>
@@ -233,7 +304,7 @@ export function ParentScalesForm({ completedScales, onSubmit }: ParentScalesForm
                 )}
               </div>
 
-              {!isScaleCompleted(key) && (
+              {!isScaleCompleted(key) && scale.questions && (
                 <>
                   <div className="space-y-6">
                     {scale.questions.map((q) => (
@@ -284,6 +355,74 @@ export function ParentScalesForm({ completedScales, onSubmit }: ParentScalesForm
               )}
             </TabsContent>
           ))}
+
+          {/* Brief SEB Check-In */}
+          <TabsContent value="seb_brief" className="space-y-6">
+            <div className="flex items-center justify-between mb-4">
+              <div>
+                <h3 className="font-medium flex items-center gap-2">
+                  <Brain className="h-4 w-4 text-primary" />
+                  Brief Parent Check-In
+                </h3>
+                <p className="text-sm text-muted-foreground">
+                  Quick 6-question social, emotional, and behavioral check-in
+                </p>
+              </div>
+              {isScaleCompleted('seb_brief') ? (
+                <Badge className="bg-success/10 text-success border-success/20">
+                  <CheckCircle className="h-3 w-3 mr-1" />
+                  Completed
+                </Badge>
+              ) : (
+                <Badge variant="secondary">
+                  <Clock className="h-3 w-3 mr-1" />
+                  Not Started
+                </Badge>
+              )}
+            </div>
+
+            {!isScaleCompleted('seb_brief') && (
+              <SEBScreenerBrief
+                onComplete={handleSEBBriefComplete}
+                onRequestFullScreener={() => {
+                  setActiveScale('seb_full');
+                }}
+              />
+            )}
+          </TabsContent>
+
+          {/* Full SEB Screener */}
+          <TabsContent value="seb_full" className="space-y-6">
+            <div className="flex items-center justify-between mb-4">
+              <div>
+                <h3 className="font-medium flex items-center gap-2">
+                  <Brain className="h-4 w-4 text-primary" />
+                  Informal Social, Emotional, and Behavioral Screener
+                </h3>
+                <p className="text-sm text-muted-foreground">
+                  Comprehensive 53-question screener covering 14 areas
+                </p>
+              </div>
+              {isScaleCompleted('seb_full') ? (
+                <Badge className="bg-success/10 text-success border-success/20">
+                  <CheckCircle className="h-3 w-3 mr-1" />
+                  Completed
+                </Badge>
+              ) : (
+                <Badge variant="secondary">
+                  <Clock className="h-3 w-3 mr-1" />
+                  Not Started
+                </Badge>
+              )}
+            </div>
+
+            {!isScaleCompleted('seb_full') && (
+              <SEBScreenerFull
+                onComplete={handleSEBFullComplete}
+                onCancel={() => setActiveScale('reading_history')}
+              />
+            )}
+          </TabsContent>
         </Tabs>
       </CardContent>
     </Card>
