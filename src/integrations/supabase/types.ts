@@ -68,6 +68,7 @@ export type Database = {
           display_order: number
           id: string
           name: string
+          parent_id: string | null
           updated_at: string
         }
         Insert: {
@@ -76,6 +77,7 @@ export type Database = {
           display_order?: number
           id?: string
           name: string
+          parent_id?: string | null
           updated_at?: string
         }
         Update: {
@@ -84,9 +86,18 @@ export type Database = {
           display_order?: number
           id?: string
           name?: string
+          parent_id?: string | null
           updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "assessment_categories_parent_id_fkey"
+            columns: ["parent_id"]
+            isOneToOne: false
+            referencedRelation: "assessment_categories"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       assessments: {
         Row: {
