@@ -44,10 +44,19 @@ interface Student {
   parents: { full_name: string; email: string } | null;
 }
 
-interface Assessment {
+interface Category {
   id: string;
   name: string;
-  description: string | null;
+  parent_id: string | null;
+}
+
+interface Subtest {
+  id: string;
+  name: string;
+  category_id: string | null;
+  grade: string | null;
+  module_type: string | null;
+  item_count: number | null;
 }
 
 interface Session {
@@ -65,9 +74,10 @@ export default function SessionLaunch() {
   
   const [students, setStudents] = useState<Student[]>([]);
   const [sessions, setSessions] = useState<Session[]>([]);
-  const [assessments, setAssessments] = useState<Assessment[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [subtests, setSubtests] = useState<Subtest[]>([]);
   const [selectedStudentId, setSelectedStudentId] = useState<string>(preselectedStudentId || "");
-  const [selectedAssessmentId, setSelectedAssessmentId] = useState<string>("");
+  const [selectedSubtestIds, setSelectedSubtestIds] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isCreating, setIsCreating] = useState(false);
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -88,7 +98,7 @@ export default function SessionLaunch() {
   const fetchData = async () => {
     setIsLoading(true);
     
-    const [studentsRes, sessionsRes, assessmentsRes] = await Promise.all([
+    const [studentsRes, sessionsRes, categoriesRes, subtestsRes] = await Promise.all([
       supabase
         .from("students")
         .select("id, full_name, grade, lead_status, parents (full_name, email)")
@@ -99,16 +109,42 @@ export default function SessionLaunch() {
         .order("created_at", { ascending: false })
         .limit(20),
       supabase
-        .from("assessments")
-        .select("id, name, description")
-        .order("name"),
+        .from("assessment_categories")
+        .select("id, name, parent_id")
+        .order("display_order"),
+      supabase
+        .from("subtests")
+        .select("id, name, category_id, grade, module_type, item_count")
+        .not("category_id", "is", null)
+        .order("order_index"),
     ]);
 
     if (studentsRes.data) setStudents(studentsRes.data);
     if (sessionsRes.data) setSessions(sessionsRes.data);
-    if (assessmentsRes.data) setAssessments(assessmentsRes.data);
+    if (categoriesRes.data) setCategories(categoriesRes.data);
+    if (subtestsRes.data) setSubtests(subtestsRes.data);
     
     setIsLoading(false);
+  };
+
+  // Group subtests by category
+  const subtestsByCategory = subtests.reduce((acc, subtest) => {
+    const catId = subtest.category_id || 'uncategorized';
+    if (!acc[catId]) acc[catId] = [];
+    acc[catId].push(subtest);
+    return acc;
+  }, {} as Record<string, Subtest[]>);
+
+  // Get reading categories (children of Reading area)
+  const readingAreaId = categories.find(c => c.name === 'Reading' && !c.parent_id)?.id;
+  const readingCategories = categories.filter(c => c.parent_id === readingAreaId);
+
+  const toggleSubtest = (subtestId: string) => {
+    setSelectedSubtestIds(prev => 
+      prev.includes(subtestId) 
+        ? prev.filter(id => id !== subtestId)
+        : [...prev, subtestId]
+    );
   };
 
   const createSession = async () => {
@@ -121,10 +157,10 @@ export default function SessionLaunch() {
       return;
     }
 
-    if (!selectedAssessmentId) {
+    if (selectedSubtestIds.length === 0) {
       toast({
-        title: "Select an assessment",
-        description: "Please select an assessment for this session.",
+        title: "Select subtests",
+        description: "Please select at least one subtest for this session.",
         variant: "destructive",
       });
       return;
@@ -135,14 +171,8 @@ export default function SessionLaunch() {
     try {
       const { data: user } = await supabase.auth.getUser();
       
-      // Get the first subtest of the selected assessment
-      const { data: firstSubtest } = await supabase
-        .from("subtests")
-        .select("id")
-        .eq("assessment_id", selectedAssessmentId)
-        .order("order_index")
-        .limit(1)
-        .single();
+      // Use the first selected subtest as the starting point
+      const firstSubtestId = selectedSubtestIds[0];
       
       const { data, error } = await supabase
         .from("sessions")
@@ -150,7 +180,9 @@ export default function SessionLaunch() {
           student_id: selectedStudentId,
           assessor_id: user.user?.id,
           status: "scheduled",
-          current_subtest_id: firstSubtest?.id || null,
+          current_subtest_id: firstSubtestId,
+          // Store selected subtest IDs in observations for now
+          observations: { selected_subtests: selectedSubtestIds },
         })
         .select("id, status, started_at, ended_at, student_id, students (full_name, grade)")
         .single();
@@ -164,10 +196,10 @@ export default function SessionLaunch() {
       } else if (data) {
         setSessions([data, ...sessions]);
         setDialogOpen(false);
-        setSelectedAssessmentId("");
+        setSelectedSubtestIds([]);
         toast({
           title: "Session created",
-          description: "You can now share the session URLs.",
+          description: `Session created with ${selectedSubtestIds.length} subtest(s).`,
         });
       }
     } catch (err) {
@@ -250,23 +282,41 @@ export default function SessionLaunch() {
                   </Select>
                 </div>
                 
-                <div className="space-y-2">
-                  <Label htmlFor="assessment">Assessment</Label>
-                  <Select value={selectedAssessmentId} onValueChange={setSelectedAssessmentId}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select an assessment..." />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {assessments.map((assessment) => (
-                        <SelectItem key={assessment.id} value={assessment.id}>
-                          {assessment.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  {selectedAssessmentId && (
+                <div className="space-y-3">
+                  <Label>Select Subtests</Label>
+                  <div className="max-h-64 overflow-y-auto border rounded-md p-2 space-y-3">
+                    {readingCategories.map((category) => {
+                      const catSubtests = subtestsByCategory[category.id] || [];
+                      if (catSubtests.length === 0) return null;
+                      return (
+                        <div key={category.id} className="space-y-1">
+                          <p className="text-sm font-medium text-muted-foreground">{category.name}</p>
+                          <div className="space-y-1 pl-2">
+                            {catSubtests.map((subtest) => (
+                              <label 
+                                key={subtest.id} 
+                                className="flex items-center gap-2 text-sm cursor-pointer hover:bg-muted/50 p-1 rounded"
+                              >
+                                <input
+                                  type="checkbox"
+                                  checked={selectedSubtestIds.includes(subtest.id)}
+                                  onChange={() => toggleSubtest(subtest.id)}
+                                  className="rounded"
+                                />
+                                <span className="flex-1">{subtest.name}</span>
+                                {subtest.grade && (
+                                  <Badge variant="outline" className="text-xs">{subtest.grade}</Badge>
+                                )}
+                              </label>
+                            ))}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                  {selectedSubtestIds.length > 0 && (
                     <p className="text-xs text-muted-foreground">
-                      {assessments.find(a => a.id === selectedAssessmentId)?.description}
+                      {selectedSubtestIds.length} subtest(s) selected
                     </p>
                   )}
                 </div>
@@ -294,8 +344,8 @@ export default function SessionLaunch() {
                 <Button variant="outline" onClick={() => setDialogOpen(false)}>
                   Cancel
                 </Button>
-                <Button onClick={createSession} disabled={!selectedStudentId || !selectedAssessmentId || isCreating}>
-                  {isCreating ? "Creating..." : "Create Session"}
+                <Button onClick={createSession} disabled={!selectedStudentId || selectedSubtestIds.length === 0 || isCreating}>
+                  {isCreating ? "Creating..." : `Create Session (${selectedSubtestIds.length})`}
                 </Button>
               </DialogFooter>
             </DialogContent>
