@@ -62,8 +62,43 @@ export function useSessionRealtime(sessionId: string): UseSessionRealtimeReturn 
         }
         setSession(sessionData);
 
-        // Fetch subtests for this session's assessment
-        if (sessionData?.current_subtest_id) {
+        // Get selected subtests from observations (new multi-subtest flow)
+        const observations = sessionData.observations as { selected_subtests?: string[] } | null;
+        const selectedSubtestIds = observations?.selected_subtests;
+
+        if (selectedSubtestIds && selectedSubtestIds.length > 0) {
+          // Fetch all selected subtests by their IDs
+          const { data: selectedSubtests, error: subtestsError } = await supabase
+            .from('subtests')
+            .select('*')
+            .in('id', selectedSubtestIds);
+          
+          if (subtestsError) throw subtestsError;
+          
+          if (selectedSubtests && selectedSubtests.length > 0) {
+            // Sort subtests in the order they were selected
+            const sortedSubtests = selectedSubtestIds
+              .map(id => selectedSubtests.find(s => s.id === id))
+              .filter((s): s is typeof selectedSubtests[0] => s !== undefined);
+            
+            setSubtests(sortedSubtests);
+            
+            // Set current subtest from session or first in list
+            if (sessionData.current_subtest_id) {
+              const current = sortedSubtests.find(s => s.id === sessionData.current_subtest_id);
+              setCurrentSubtest(current || sortedSubtests[0]);
+            } else {
+              // No current set, use first selected subtest
+              setCurrentSubtest(sortedSubtests[0]);
+              // Update session with first subtest
+              await supabase
+                .from('sessions')
+                .update({ current_subtest_id: sortedSubtests[0].id })
+                .eq('id', sessionId);
+            }
+          }
+        } else if (sessionData.current_subtest_id) {
+          // Fallback: single subtest flow (legacy)
           const { data: subtestData } = await supabase
             .from('subtests')
             .select('*')
@@ -72,19 +107,10 @@ export function useSessionRealtime(sessionId: string): UseSessionRealtimeReturn 
           
           if (subtestData) {
             setCurrentSubtest(subtestData);
-            
-            // Fetch all subtests for the assessment
-            const { data: allSubtests } = await supabase
-              .from('subtests')
-              .select('*')
-              .eq('assessment_id', subtestData.assessment_id)
-              .order('order_index');
-            
-            if (allSubtests) setSubtests(allSubtests);
+            setSubtests([subtestData]);
           }
         } else {
-          // No current subtest set - session was created without an assessment
-          setError('No assessment assigned to this session. Please create a new session with an assessment selected.');
+          setError('No assessment assigned to this session. Please create a new session with subtests selected.');
         }
 
         // Fetch existing responses

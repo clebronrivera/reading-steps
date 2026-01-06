@@ -35,17 +35,23 @@ export function StudentView({ sessionId }: StudentViewProps) {
           .from('sessions')
           .select('*')
           .eq('id', sessionId)
-          .single();
+          .maybeSingle();
 
         if (sessionError) throw sessionError;
+        if (!sessionData) {
+          setError('Session not found');
+          setIsLoading(false);
+          return;
+        }
         setSession(sessionData);
 
+        // Load current subtest
         if (sessionData?.current_subtest_id) {
           const { data: subtestData } = await supabase
             .from('subtests')
             .select('*')
             .eq('id', sessionData.current_subtest_id)
-            .single();
+            .maybeSingle();
           
           if (subtestData) {
             setCurrentSubtest(subtestData);
@@ -82,10 +88,12 @@ export function StudentView({ sessionId }: StudentViewProps) {
               .from('subtests')
               .select('*')
               .eq('id', newSession.current_subtest_id)
-              .single();
+              .maybeSingle();
             
             if (subtestData) {
               setCurrentSubtest(subtestData);
+              // Reset item index when subtest changes
+              setSessionState(prev => ({ ...prev, currentItemIndex: 0 }));
             }
           }
         }
