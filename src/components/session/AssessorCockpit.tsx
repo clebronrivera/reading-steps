@@ -61,7 +61,15 @@ export function AssessorCockpit({ sessionId }: AssessorCockpitProps) {
   // Calculate total items from stimulus data
   const totalItems = useMemo(() => {
     if (!currentSubtest?.stimulus_data) return 0;
-    const data = currentSubtest.stimulus_data as { items?: unknown[] };
+    const data = currentSubtest.stimulus_data as { 
+      items?: unknown[]; 
+      questions?: unknown[];
+      type?: string;
+    };
+    // For comprehension, count questions; otherwise count items
+    if (data.type === 'comprehension' || data.questions) {
+      return data.questions?.length || 0;
+    }
     return data.items?.length || currentSubtest.item_count || 0;
   }, [currentSubtest]);
 
