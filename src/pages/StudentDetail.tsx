@@ -18,8 +18,11 @@ import {
   CheckCircle,
   Clock,
   FileText,
-  Play
+  Play,
+  ClipboardList
 } from "lucide-react";
+import { AssignScalesDialog } from "@/components/dashboard/AssignScalesDialog";
+import { GeneratePortalLinkDialog } from "@/components/dashboard/GeneratePortalLinkDialog";
 
 type LeadStatus = "new" | "scheduled" | "completed" | "follow_up_needed" | "converted";
 type RiskLevel = "low" | "moderate" | "high" | "critical";
@@ -43,6 +46,7 @@ export default function StudentDetail() {
   const { id } = useParams<{ id: string }>();
   const [student, setStudent] = useState<any>(null);
   const [sessions, setSessions] = useState<any[]>([]);
+  const [parentScales, setParentScales] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -78,6 +82,16 @@ export default function StudentDetail() {
 
     if (!sessionError && sessionData) {
       setSessions(sessionData);
+    }
+
+    // Fetch parent scales for this student
+    const { data: scalesData, error: scalesError } = await supabase
+      .from("parent_scales")
+      .select("*")
+      .eq("student_id", id);
+
+    if (!scalesError && scalesData) {
+      setParentScales(scalesData);
     }
 
     setIsLoading(false);
@@ -319,6 +333,17 @@ export default function StudentDetail() {
                   Start Session
                 </Button>
               </Link>
+              <GeneratePortalLinkDialog
+                studentId={student.id}
+                studentName={student.full_name}
+                parentEmail={student.parents?.email}
+              />
+              <AssignScalesDialog
+                studentId={student.id}
+                studentName={student.full_name}
+                existingScales={parentScales.map((s: any) => s.scale_type)}
+                onAssigned={fetchStudentData}
+              />
             </CardContent>
           </Card>
 
@@ -351,6 +376,56 @@ export default function StudentDetail() {
                 </div>
               ) : (
                 <p className="text-sm text-muted-foreground">No appointments scheduled</p>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Parent Scales */}
+          <Card className="card-elevated border-0">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <ClipboardList className="h-5 w-5" />
+                Parent Scales
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              {parentScales.length > 0 ? (
+                <div className="space-y-3">
+                  {parentScales.map((scale: any) => {
+                    const scaleNames: Record<string, string> = {
+                      seb_brief: "Brief SEB Screener",
+                      seb_full: "Full SEB Screener",
+                      reading_history: "Reading History",
+                      attention_screener: "Attention Screener",
+                    };
+                    return (
+                      <div key={scale.id} className="p-3 rounded-lg bg-muted/50">
+                        <div className="flex items-center justify-between mb-1">
+                          <span className="text-sm font-medium">
+                            {scaleNames[scale.scale_type] || scale.scale_type}
+                          </span>
+                          <Badge
+                            variant="outline"
+                            className={
+                              scale.completed_at
+                                ? "bg-green-500/10 text-green-600"
+                                : "bg-amber-500/10 text-amber-600"
+                            }
+                          >
+                            {scale.completed_at ? "Completed" : "Pending"}
+                          </Badge>
+                        </div>
+                        {scale.completed_at && (
+                          <p className="text-xs text-muted-foreground">
+                            Completed {format(new Date(scale.completed_at), "MMM d, yyyy")}
+                          </p>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              ) : (
+                <p className="text-sm text-muted-foreground">No scales assigned yet</p>
               )}
             </CardContent>
           </Card>
