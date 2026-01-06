@@ -56,6 +56,7 @@ export function AssessorCockpit({ sessionId }: AssessorCockpitProps) {
   } = useSessionRealtime(sessionId);
 
   const [observations, setObservations] = useState<Record<string, number | string>>({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Calculate total items from stimulus data
   const totalItems = useMemo(() => {
@@ -114,6 +115,26 @@ export function AssessorCockpit({ sessionId }: AssessorCockpitProps) {
       toast.info('No more subtests available');
     }
   }, [subtests, currentSubtest, navigateToSubtest]);
+
+  const handleSubmitSubtest = useCallback(async () => {
+    if (!currentSubtest) return;
+    
+    setIsSubmitting(true);
+    try {
+      // Move to next subtest after saving
+      const currentIndex = subtests.findIndex(s => s.id === currentSubtest.id);
+      if (currentIndex < subtests.length - 1) {
+        await navigateToSubtest(subtests[currentIndex + 1].id);
+        toast.success(`Submitted ${currentSubtest.name}, moving to next subtest`);
+      } else {
+        toast.success(`Submitted ${currentSubtest.name} - all subtests complete!`);
+      }
+    } catch (err) {
+      toast.error('Failed to submit subtest');
+    } finally {
+      setIsSubmitting(false);
+    }
+  }, [currentSubtest, subtests, navigateToSubtest]);
 
   const handleEndSession = useCallback(async (validity: ValidityStatus) => {
     try {
@@ -248,9 +269,12 @@ export function AssessorCockpit({ sessionId }: AssessorCockpitProps) {
               currentSubtest={currentSubtest}
               currentItemIndex={sessionState.currentItemIndex}
               totalItems={totalItems}
+              responsesCount={subtestResponses.length}
               onNavigateSubtest={navigateToSubtest}
               onNavigateItem={(idx) => updateSessionState({ currentItemIndex: idx })}
               onDiscontinue={handleDiscontinue}
+              onSubmitSubtest={handleSubmitSubtest}
+              isSubmitting={isSubmitting}
             />
 
             {/* Observations */}
