@@ -44,6 +44,12 @@ interface Student {
   parents: { full_name: string; email: string } | null;
 }
 
+interface Assessment {
+  id: string;
+  name: string;
+  description: string | null;
+}
+
 interface Session {
   id: string;
   status: string | null;
@@ -59,7 +65,9 @@ export default function SessionLaunch() {
   
   const [students, setStudents] = useState<Student[]>([]);
   const [sessions, setSessions] = useState<Session[]>([]);
+  const [assessments, setAssessments] = useState<Assessment[]>([]);
   const [selectedStudentId, setSelectedStudentId] = useState<string>(preselectedStudentId || "");
+  const [selectedAssessmentId, setSelectedAssessmentId] = useState<string>("");
   const [isLoading, setIsLoading] = useState(true);
   const [isCreating, setIsCreating] = useState(false);
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -80,7 +88,7 @@ export default function SessionLaunch() {
   const fetchData = async () => {
     setIsLoading(true);
     
-    const [studentsRes, sessionsRes] = await Promise.all([
+    const [studentsRes, sessionsRes, assessmentsRes] = await Promise.all([
       supabase
         .from("students")
         .select("id, full_name, grade, lead_status, parents (full_name, email)")
@@ -89,11 +97,16 @@ export default function SessionLaunch() {
         .from("sessions")
         .select("id, status, started_at, ended_at, student_id, students (full_name, grade)")
         .order("created_at", { ascending: false })
-        .limit(20)
+        .limit(20),
+      supabase
+        .from("assessments")
+        .select("id, name, description")
+        .order("name"),
     ]);
 
     if (studentsRes.data) setStudents(studentsRes.data);
     if (sessionsRes.data) setSessions(sessionsRes.data);
+    if (assessmentsRes.data) setAssessments(assessmentsRes.data);
     
     setIsLoading(false);
   };
@@ -108,32 +121,60 @@ export default function SessionLaunch() {
       return;
     }
 
-    setIsCreating(true);
-    
-    const { data: user } = await supabase.auth.getUser();
-    
-    const { data, error } = await supabase
-      .from("sessions")
-      .insert({
-        student_id: selectedStudentId,
-        assessor_id: user.user?.id,
-        status: "scheduled",
-      })
-      .select("id, status, started_at, ended_at, student_id, students (full_name, grade)")
-      .single();
-
-    if (error) {
+    if (!selectedAssessmentId) {
       toast({
-        title: "Error creating session",
-        description: error.message,
+        title: "Select an assessment",
+        description: "Please select an assessment for this session.",
         variant: "destructive",
       });
-    } else if (data) {
-      setSessions([data, ...sessions]);
-      setDialogOpen(false);
+      return;
+    }
+
+    setIsCreating(true);
+    
+    try {
+      const { data: user } = await supabase.auth.getUser();
+      
+      // Get the first subtest of the selected assessment
+      const { data: firstSubtest } = await supabase
+        .from("subtests")
+        .select("id")
+        .eq("assessment_id", selectedAssessmentId)
+        .order("order_index")
+        .limit(1)
+        .single();
+      
+      const { data, error } = await supabase
+        .from("sessions")
+        .insert({
+          student_id: selectedStudentId,
+          assessor_id: user.user?.id,
+          status: "scheduled",
+          current_subtest_id: firstSubtest?.id || null,
+        })
+        .select("id, status, started_at, ended_at, student_id, students (full_name, grade)")
+        .single();
+
+      if (error) {
+        toast({
+          title: "Error creating session",
+          description: error.message,
+          variant: "destructive",
+        });
+      } else if (data) {
+        setSessions([data, ...sessions]);
+        setDialogOpen(false);
+        setSelectedAssessmentId("");
+        toast({
+          title: "Session created",
+          description: "You can now share the session URLs.",
+        });
+      }
+    } catch (err) {
       toast({
-        title: "Session created",
-        description: "You can now share the session URLs.",
+        title: "Error",
+        description: "Failed to create session",
+        variant: "destructive",
       });
     }
 
@@ -209,6 +250,27 @@ export default function SessionLaunch() {
                   </Select>
                 </div>
                 
+                <div className="space-y-2">
+                  <Label htmlFor="assessment">Assessment</Label>
+                  <Select value={selectedAssessmentId} onValueChange={setSelectedAssessmentId}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select an assessment..." />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {assessments.map((assessment) => (
+                        <SelectItem key={assessment.id} value={assessment.id}>
+                          {assessment.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  {selectedAssessmentId && (
+                    <p className="text-xs text-muted-foreground">
+                      {assessments.find(a => a.id === selectedAssessmentId)?.description}
+                    </p>
+                  )}
+                </div>
+                
                 {selectedStudent && (
                   <Card className="bg-muted/50">
                     <CardContent className="pt-4">
@@ -232,7 +294,7 @@ export default function SessionLaunch() {
                 <Button variant="outline" onClick={() => setDialogOpen(false)}>
                   Cancel
                 </Button>
-                <Button onClick={createSession} disabled={!selectedStudentId || isCreating}>
+                <Button onClick={createSession} disabled={!selectedStudentId || !selectedAssessmentId || isCreating}>
                   {isCreating ? "Creating..." : "Create Session"}
                 </Button>
               </DialogFooter>

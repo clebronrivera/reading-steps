@@ -52,9 +52,14 @@ export function useSessionRealtime(sessionId: string): UseSessionRealtimeReturn 
           .from('sessions')
           .select('*')
           .eq('id', sessionId)
-          .single();
+          .maybeSingle();
 
         if (sessionError) throw sessionError;
+        if (!sessionData) {
+          setError('Session not found');
+          setIsLoading(false);
+          return;
+        }
         setSession(sessionData);
 
         // Fetch subtests for this session's assessment
@@ -63,7 +68,7 @@ export function useSessionRealtime(sessionId: string): UseSessionRealtimeReturn 
             .from('subtests')
             .select('*')
             .eq('id', sessionData.current_subtest_id)
-            .single();
+            .maybeSingle();
           
           if (subtestData) {
             setCurrentSubtest(subtestData);
@@ -77,6 +82,9 @@ export function useSessionRealtime(sessionId: string): UseSessionRealtimeReturn 
             
             if (allSubtests) setSubtests(allSubtests);
           }
+        } else {
+          // No current subtest set - session was created without an assessment
+          setError('No assessment assigned to this session. Please create a new session with an assessment selected.');
         }
 
         // Fetch existing responses
