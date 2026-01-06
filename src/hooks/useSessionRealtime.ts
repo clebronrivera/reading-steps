@@ -21,8 +21,11 @@ export interface UseSessionRealtimeReturn {
   sessionState: SessionState;
   isLoading: boolean;
   error: string | null;
+  completedSubtestIds: string[];
   updateSessionState: (updates: Partial<SessionState>) => void;
   navigateToSubtest: (subtestId: string) => Promise<void>;
+  addSubtest: (subtest: Subtest) => Promise<void>;
+  completeCurrentSubtest: () => Promise<void>;
   recordResponse: (response: Omit<Database['public']['Tables']['responses']['Insert'], 'session_id'>) => Promise<{ data: Response | null }>;
   updateSession: (updates: Partial<Database['public']['Tables']['sessions']['Update']>) => Promise<void>;
 }
@@ -32,6 +35,7 @@ export function useSessionRealtime(sessionId: string): UseSessionRealtimeReturn 
   const [currentSubtest, setCurrentSubtest] = useState<Subtest | null>(null);
   const [subtests, setSubtests] = useState<Subtest[]>([]);
   const [responses, setResponses] = useState<Response[]>([]);
+  const [completedSubtestIds, setCompletedSubtestIds] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [sessionState, setSessionState] = useState<SessionState>({
@@ -110,7 +114,10 @@ export function useSessionRealtime(sessionId: string): UseSessionRealtimeReturn 
             setSubtests([subtestData]);
           }
         } else {
-          setError('No assessment assigned to this session. Please create a new session with subtests selected.');
+          // No subtests pre-selected - this is fine for live picking mode
+          // The assessor will pick subtests from the cockpit
+          setCurrentSubtest(null);
+          setSubtests([]);
         }
 
         // Fetch existing responses
@@ -185,19 +192,79 @@ export function useSessionRealtime(sessionId: string): UseSessionRealtimeReturn 
 
   // Navigate to a different subtest
   const navigateToSubtest = useCallback(async (subtestId: string) => {
-    const { error } = await supabase
-      .from('sessions')
-      .update({ current_subtest_id: subtestId })
-      .eq('id', sessionId);
+    // First check if subtest is already in our list
+    let subtest = subtests.find(s => s.id === subtestId);
     
-    if (error) throw error;
-
-    const subtest = subtests.find(s => s.id === subtestId);
+    // If not, fetch it
+    if (!subtest) {
+      const { data } = await supabase
+        .from('subtests')
+        .select('*')
+        .eq('id', subtestId)
+        .maybeSingle();
+      
+      if (data) {
+        subtest = data;
+        setSubtests(prev => [...prev, data]);
+      }
+    }
+    
     if (subtest) {
+      // Update session in DB
+      const { error } = await supabase
+        .from('sessions')
+        .update({ current_subtest_id: subtestId })
+        .eq('id', sessionId);
+      
+      if (error) throw error;
+
       setCurrentSubtest(subtest);
       updateSessionState({ currentItemIndex: 0, timerSeconds: 0, isTimerRunning: false });
     }
   }, [sessionId, subtests, updateSessionState]);
+
+  // Add a new subtest to the session
+  const addSubtest = useCallback(async (subtest: Subtest) => {
+    // Add to local list if not already there
+    setSubtests(prev => {
+      if (prev.find(s => s.id === subtest.id)) return prev;
+      return [...prev, subtest];
+    });
+    
+    // Update session observations with new subtest list
+    const currentObservations = session?.observations as { selected_subtests?: string[] } | null;
+    const currentSelected = currentObservations?.selected_subtests || [];
+    const newSelected = currentSelected.includes(subtest.id) 
+      ? currentSelected 
+      : [...currentSelected, subtest.id];
+    
+    await supabase
+      .from('sessions')
+      .update({ 
+        observations: { ...currentObservations, selected_subtests: newSelected },
+        current_subtest_id: subtest.id,
+        status: 'in_progress'
+      })
+      .eq('id', sessionId);
+    
+    setCurrentSubtest(subtest);
+    updateSessionState({ currentItemIndex: 0, timerSeconds: 0, isTimerRunning: false });
+  }, [sessionId, session, updateSessionState]);
+
+  // Mark current subtest as completed
+  const completeCurrentSubtest = useCallback(async () => {
+    if (currentSubtest) {
+      setCompletedSubtestIds(prev => 
+        prev.includes(currentSubtest.id) ? prev : [...prev, currentSubtest.id]
+      );
+      // Clear current subtest - will show picker
+      setCurrentSubtest(null);
+      await supabase
+        .from('sessions')
+        .update({ current_subtest_id: null })
+        .eq('id', sessionId);
+    }
+  }, [currentSubtest, sessionId]);
 
   // Record a response
   const recordResponse = useCallback(async (
@@ -236,8 +303,11 @@ export function useSessionRealtime(sessionId: string): UseSessionRealtimeReturn 
     sessionState,
     isLoading,
     error,
+    completedSubtestIds,
     updateSessionState,
     navigateToSubtest,
+    addSubtest,
+    completeCurrentSubtest,
     recordResponse,
     updateSession,
   };

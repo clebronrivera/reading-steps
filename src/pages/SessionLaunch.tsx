@@ -147,7 +147,7 @@ export default function SessionLaunch() {
     );
   };
 
-  const createSession = async () => {
+  const createSession = async (skipSubtests = false) => {
     if (!selectedStudentId) {
       toast({
         title: "Select a student",
@@ -157,10 +157,11 @@ export default function SessionLaunch() {
       return;
     }
 
-    if (selectedSubtestIds.length === 0) {
+    // Only require subtests if not skipping
+    if (!skipSubtests && selectedSubtestIds.length === 0) {
       toast({
         title: "Select subtests",
-        description: "Please select at least one subtest for this session.",
+        description: "Please select at least one subtest, or click 'Start Empty' to pick during session.",
         variant: "destructive",
       });
       return;
@@ -171,8 +172,8 @@ export default function SessionLaunch() {
     try {
       const { data: user } = await supabase.auth.getUser();
       
-      // Use the first selected subtest as the starting point
-      const firstSubtestId = selectedSubtestIds[0];
+      // Use the first selected subtest as the starting point (or null for live picking)
+      const firstSubtestId = selectedSubtestIds.length > 0 ? selectedSubtestIds[0] : null;
       
       const { data, error } = await supabase
         .from("sessions")
@@ -181,7 +182,7 @@ export default function SessionLaunch() {
           assessor_id: user.user?.id,
           status: "scheduled",
           current_subtest_id: firstSubtestId,
-          // Store selected subtest IDs in observations for now
+          // Store selected subtest IDs in observations (empty array for live picking)
           observations: { selected_subtests: selectedSubtestIds },
         })
         .select("id, status, started_at, ended_at, student_id, students (full_name, grade)")
@@ -199,7 +200,9 @@ export default function SessionLaunch() {
         setSelectedSubtestIds([]);
         toast({
           title: "Session created",
-          description: `Session created with ${selectedSubtestIds.length} subtest(s).`,
+          description: skipSubtests 
+            ? "Session created - pick assessments live from the cockpit."
+            : `Session created with ${selectedSubtestIds.length} subtest(s).`,
         });
       }
     } catch (err) {
@@ -340,11 +343,21 @@ export default function SessionLaunch() {
                 )}
               </div>
               
-              <DialogFooter>
+              <DialogFooter className="flex-col sm:flex-row gap-2">
                 <Button variant="outline" onClick={() => setDialogOpen(false)}>
                   Cancel
                 </Button>
-                <Button onClick={createSession} disabled={!selectedStudentId || selectedSubtestIds.length === 0 || isCreating}>
+                <Button 
+                  variant="secondary" 
+                  onClick={() => createSession(true)} 
+                  disabled={!selectedStudentId || isCreating}
+                >
+                  Start Empty (Pick Live)
+                </Button>
+                <Button 
+                  onClick={() => createSession(false)} 
+                  disabled={!selectedStudentId || selectedSubtestIds.length === 0 || isCreating}
+                >
                   {isCreating ? "Creating..." : `Create Session (${selectedSubtestIds.length})`}
                 </Button>
               </DialogFooter>
