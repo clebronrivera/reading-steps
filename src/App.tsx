@@ -15,6 +15,7 @@ import Intake from "./pages/Intake";
 import Schedule from "./pages/Schedule";
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
+import StudentDetail from "./pages/StudentDetail";
 import SessionAssessor from "./pages/SessionAssessor";
 import SessionStudent from "./pages/SessionStudent";
 import SessionCover from "./pages/SessionCover";
@@ -47,6 +48,7 @@ const App = () => (
           
           {/* Dashboard Routes */}
           <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/dashboard/student/:id" element={<StudentDetail />} />
           <Route path="/dashboard/session" element={<SessionLaunch />} />
           <Route path="/dashboard/passages" element={<PassageManager />} />
           
