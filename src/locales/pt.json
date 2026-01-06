@@ -1,4 +1,26 @@
 {
+  "nav": {
+    "home": "Início",
+    "howItWorks": "Como Funciona",
+    "faq": "Perguntas Frequentes",
+    "about": "Sobre",
+    "bookFreeScreener": "Agendar Avaliação Gratuita",
+    "staffLogin": "Login da Equipe"
+  },
+  "footer": {
+    "description": "Avaliações virtuais gratuitas de leitura para identificar padrões de habilidades e riscos precocemente.",
+    "quickLinks": "Links Rápidos",
+    "legal": "Legal",
+    "privacy": "Política de Privacidade",
+    "terms": "Termos de Serviço",
+    "disclaimer": "Aviso Legal",
+    "copyright": "© {year} ReadingScreener.",
+    "note": "Este é um serviço de avaliação para identificar padrões de habilidades e riscos. Não diagnostica uma deficiência."
+  },
+  "home": {},
+  "howItWorks": {},
+  "faq": {},
+  "about": {},
   "intake": {
     "title": "Formulário de Admissão",
     "subtitle": "Preencha este formulário para agendar sua sessão gratuita de avaliação de leitura.",

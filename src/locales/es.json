@@ -1,4 +1,26 @@
 {
+  "nav": {
+    "home": "Inicio",
+    "howItWorks": "Cómo Funciona",
+    "faq": "Preguntas Frecuentes",
+    "about": "Acerca de",
+    "bookFreeScreener": "Reservar Evaluación Gratuita",
+    "staffLogin": "Acceso del Personal"
+  },
+  "footer": {
+    "description": "Evaluaciones virtuales gratuitas de lectura para identificar patrones de habilidades y riesgos tempranamente.",
+    "quickLinks": "Enlaces Rápidos",
+    "legal": "Legal",
+    "privacy": "Política de Privacidad",
+    "terms": "Términos de Servicio",
+    "disclaimer": "Descargo de Responsabilidad",
+    "copyright": "© {year} ReadingScreener.",
+    "note": "Este es un servicio de evaluación para identificar patrones de habilidades y riesgos. No diagnostica una discapacidad."
+  },
+  "home": {},
+  "howItWorks": {},
+  "faq": {},
+  "about": {},
   "intake": {
     "title": "Formulario de Admisión",
     "subtitle": "Complete este formulario para reservar su sesión gratuita de evaluación de lectura.",
