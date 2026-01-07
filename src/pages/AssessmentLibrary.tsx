@@ -1,4 +1,5 @@
 import { useState, useMemo } from "react";
+import { useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
@@ -64,6 +65,7 @@ const MODULE_ICONS: Record<string, typeof BookOpen> = {
 };
 
 export default function AssessmentLibrary() {
+  const navigate = useNavigate();
   const [search, setSearch] = useState("");
   const [showArchived, setShowArchived] = useState(false);
 
@@ -230,7 +232,8 @@ export default function AssessmentLibrary() {
     return (
       <div
         key={subtest.id}
-        className={`flex items-center justify-between p-3 rounded-lg border bg-card hover:bg-accent/50 transition-colors ${
+        onClick={() => navigate(`/dashboard/assessments/${subtest.id}`)}
+        className={`flex items-center justify-between p-3 rounded-lg border bg-card hover:bg-accent/50 transition-colors cursor-pointer ${
           subtest.is_archived ? "opacity-60" : ""
         }`}
       >
@@ -259,7 +262,10 @@ export default function AssessmentLibrary() {
         <Button
           variant="ghost"
           size="sm"
-          onClick={() => handleArchive(subtest.id, !subtest.is_archived)}
+          onClick={(e) => {
+            e.stopPropagation();
+            handleArchive(subtest.id, !subtest.is_archived);
+          }}
         >
           {subtest.is_archived ? (
             <ArchiveRestore className="h-4 w-4" />
