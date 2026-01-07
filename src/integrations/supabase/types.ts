@@ -779,6 +779,7 @@ export type Database = {
           discontinue_rule: Json | null
           grade: string | null
           id: string
+          is_archived: boolean
           item_count: number | null
           modality: Database["public"]["Enums"]["modality"] | null
           module_type: Database["public"]["Enums"]["module_type"] | null
@@ -798,6 +799,7 @@ export type Database = {
           discontinue_rule?: Json | null
           grade?: string | null
           id?: string
+          is_archived?: boolean
           item_count?: number | null
           modality?: Database["public"]["Enums"]["modality"] | null
           module_type?: Database["public"]["Enums"]["module_type"] | null
@@ -817,6 +819,7 @@ export type Database = {
           discontinue_rule?: Json | null
           grade?: string | null
           id?: string
+          is_archived?: boolean
           item_count?: number | null
           modality?: Database["public"]["Enums"]["modality"] | null
           module_type?: Database["public"]["Enums"]["module_type"] | null
