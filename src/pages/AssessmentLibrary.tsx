@@ -106,7 +106,10 @@ export default function AssessmentLibrary() {
 
     return AREAS.map((area) => {
       const areaCategory = topLevelCategories.find((c) => c.name === area.name);
-      return { ...area, categoryId: null, children: [], directSubtests: [] as Subtest[], subtestCount: 0 };
+      if (!areaCategory) {
+        return { ...area, categoryId: null, children: [], directSubtests: [] as Subtest[], subtestCount: 0 };
+      }
+      
       // Get direct children (categories under this area)
       const areaChildren = childCategories
         .filter((c) => c.parent_id === areaCategory.id)
